@@ -66,29 +66,29 @@ export default function AppIndex() {
             setCreatingSite(true)
             createSite(event)
           }}
-          className='inline-block w-full max-w-md pt-8 overflow-hidden text-center align-middle transition-all bg-white shadow-xl rounded-lg'
+          className='inline-block w-full max-w-md pt-8 overflow-hidden text-center align-middle transition-all bg-white rounded-lg shadow-xl'
         >
-          <h2 className='font-cal text-2xl mb-6'>Create a New Site</h2>
-          <div className='grid gap-y-5 w-5/6 mx-auto'>
-            <div className='border border-gray-700 rounded-lg flex flex-start items-center'>
+          <h2 className='mb-6 text-2xl font-cal'>Create a New Site</h2>
+          <div className='grid w-5/6 mx-auto gap-y-5'>
+            <div className='flex items-center border border-gray-700 rounded-lg flex-start'>
               <span className='pl-5 pr-1'>📌</span>
               <input
-                className='w-full px-5 py-3 text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-r-lg placeholder-gray-400'
+                className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-r-lg focus:outline-none focus:ring-0'
                 type='text'
                 name='name'
                 placeholder='Site Name'
               />
             </div>
-            <div className='border border-gray-700 rounded-lg flex flex-start items-center'>
+            <div className='flex items-center border border-gray-700 rounded-lg flex-start'>
               <span className='pl-5 pr-1'>🪧</span>
               <input
-                className='w-full px-5 py-3 text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-l-lg placeholder-gray-400'
+                className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-l-lg focus:outline-none focus:ring-0'
                 type='text'
                 name='subdomain'
                 placeholder='Subdomain'
                 onInput={(e) => setSubdomain(e.target.value)}
               />
-              <span className='px-5 bg-gray-100 h-full flex items-center rounded-r-lg border-l border-gray-600'>
+              <span className='flex items-center h-full px-5 bg-gray-100 border-l border-gray-600 rounded-r-lg'>
                 .vercel.pub
               </span>
             </div>
@@ -97,21 +97,21 @@ export default function AppIndex() {
                 <b>{error}</b> is not available. Please choose another subdomain.
               </p>
             )}
-            <div className='border border-gray-700 rounded-lg flex flex-start items-top'>
+            <div className='flex border border-gray-700 rounded-lg flex-start items-top'>
               <span className='pl-5 pr-1 mt-3'>✍️</span>
               <textarea
                 required
                 name='description'
                 rows='3'
-                className='w-full px-5 py-3 text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-r-lg placeholder-gray-400'
+                className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-r-lg focus:outline-none focus:ring-0'
                 placeholder='Description'
               />
             </div>
           </div>
-          <div className='flex justify-between items-center mt-10 w-full'>
+          <div className='flex items-center justify-between w-full mt-10'>
             <button
               type='button'
-              className='w-full px-5 py-5 text-sm text-gray-600 hover:text-black border-t border-gray-300 rounded-bl focus:outline-none focus:ring-0 transition-all ease-in-out duration-150'
+              className='w-full px-5 py-5 text-sm text-gray-600 transition-all duration-150 ease-in-out border-t border-gray-300 rounded-bl hover:text-black focus:outline-none focus:ring-0'
               onClick={() => {
                 setError(null)
                 setShowModal(false)
@@ -135,34 +135,34 @@ export default function AppIndex() {
         </form>
       </Modal>
 
-      <div className='py-20 max-w-screen-xl mx-auto px-10 sm:px-20'>
-        <div className='flex flex-col sm:flex-row space-y-5 sm:space-y-0 justify-between items-center'>
-          <h1 className='font-cal text-5xl'>My Sites</h1>
+      <div className='max-w-screen-xl px-10 py-20 mx-auto sm:px-20'>
+        <div className='flex flex-col items-center justify-between space-y-5 sm:flex-row sm:space-y-0'>
+          <h1 className='text-5xl font-cal'>My Sites</h1>
           <button
             onClick={() => setShowModal(true)}
-            className='font-cal text-lg w-3/4 sm:w-40 tracking-wide text-white bg-black border-black border-2 px-5 py-3 hover:bg-white hover:text-black transition-all ease-in-out duration-150'
+            className='w-3/4 px-5 py-3 text-lg tracking-wide text-white transition-all duration-150 ease-in-out bg-black border-2 border-black font-cal sm:w-40 hover:bg-white hover:text-black'
           >
             New Site <span className='ml-2'>＋</span>
           </button>
         </div>
-        <div className='my-10 grid gap-y-10'>
+        <div className='grid my-10 gap-y-10'>
           {sites ? (
             sites.length > 0 ? (
               sites.map((site) => (
                 <Link href={`/site/${site.id}`} key={site.id}>
                   <a>
-                    <div className='flex flex-col md:flex-row md:h-60 rounded-lg overflow-hidden border border-gray-200'>
+                    <div className='flex flex-col overflow-hidden border border-gray-200 rounded-lg md:flex-row md:h-60'>
                       <div className='relative w-full h-60 md:h-auto md:w-1/3 md:flex-none'>
                         <BlurImage src={site.image} layout='fill' objectFit='cover' alt={site.name} />
                       </div>
                       <div className='relative p-10'>
-                        <h2 className='font-cal text-3xl'>{site.name}</h2>
-                        <p className='text-base my-5 line-clamp-3'>{site.description}</p>
+                        <h2 className='text-3xl font-cal'>{site.name}</h2>
+                        <p className='my-5 text-base line-clamp-3'>{site.description}</p>
                         <a
                           onClick={(e) => e.stopPropagation()}
                           href={`https://${site.subdomain}.vercel.pub`}
                           target='_blank'
-                          className='font-cal px-3 py-1 tracking-wide rounded bg-gray-200 text-gray-600 absolute bottom-5 left-10 whitespace-nowrap'
+                          className='absolute px-3 py-1 tracking-wide text-gray-600 bg-gray-200 rounded font-cal bottom-5 left-10 whitespace-nowrap'
                           rel='noreferrer'
                         >
                           {site.subdomain}.vercel.pub ↗
@@ -174,17 +174,17 @@ export default function AppIndex() {
               ))
             ) : (
               <>
-                <div className='flex flex-col md:flex-row md:h-60 rounded-lg overflow-hidden border border-gray-200'>
-                  <div className='relative w-full h-60 md:h-auto md:w-1/3 md:flex-none bg-gray-300' />
-                  <div className='relative p-10 grid gap-5'>
-                    <div className='w-28 h-10 rounded-md bg-gray-300' />
-                    <div className='w-48 h-6 rounded-md bg-gray-300' />
-                    <div className='w-48 h-6 rounded-md bg-gray-300' />
-                    <div className='w-48 h-6 rounded-md bg-gray-300' />
+                <div className='flex flex-col overflow-hidden border border-gray-200 rounded-lg md:flex-row md:h-60'>
+                  <div className='relative w-full bg-gray-300 h-60 md:h-auto md:w-1/3 md:flex-none' />
+                  <div className='relative grid gap-5 p-10'>
+                    <div className='h-10 bg-gray-300 rounded-md w-28' />
+                    <div className='w-48 h-6 bg-gray-300 rounded-md' />
+                    <div className='w-48 h-6 bg-gray-300 rounded-md' />
+                    <div className='w-48 h-6 bg-gray-300 rounded-md' />
                   </div>
                 </div>
                 <div className='text-center'>
-                  <p className='text-2xl font-cal text-gray-600'>
+                  <p className='text-2xl text-gray-600 font-cal'>
                     No sites yet. Click "New Site" to create one.
                   </p>
                 </div>
@@ -194,14 +194,14 @@ export default function AppIndex() {
             [0, 1].map((i) => (
               <div
                 key={i}
-                className='flex flex-col md:flex-row md:h-60 rounded-lg overflow-hidden border border-gray-200'
+                className='flex flex-col overflow-hidden border border-gray-200 rounded-lg md:flex-row md:h-60'
               >
-                <div className='relative w-full h-60 md:h-auto md:w-1/3 md:flex-none bg-gray-300 animate-pulse' />
-                <div className='relative p-10 grid gap-5'>
-                  <div className='w-28 h-10 rounded-md bg-gray-300 animate-pulse' />
-                  <div className='w-48 h-6 rounded-md bg-gray-300 animate-pulse' />
-                  <div className='w-48 h-6 rounded-md bg-gray-300 animate-pulse' />
-                  <div className='w-48 h-6 rounded-md bg-gray-300 animate-pulse' />
+                <div className='relative w-full bg-gray-300 h-60 md:h-auto md:w-1/3 md:flex-none animate-pulse' />
+                <div className='relative grid gap-5 p-10'>
+                  <div className='h-10 bg-gray-300 rounded-md w-28 animate-pulse' />
+                  <div className='w-48 h-6 bg-gray-300 rounded-md animate-pulse' />
+                  <div className='w-48 h-6 bg-gray-300 rounded-md animate-pulse' />
+                  <div className='w-48 h-6 bg-gray-300 rounded-md animate-pulse' />
                 </div>
               </div>
             ))

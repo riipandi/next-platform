@@ -1,6 +1,7 @@
-import visit from 'unist-util-visit'
-import { getTweets } from '@/libraries/twitter'
 import Link from 'next/link'
+import visit from 'unist-util-visit'
+
+import { getTweets } from '@/libraries/twitter'
 
 export function replaceLinks({ children, href }) {
   // this is technically not a remark plugin but it
@@ -82,7 +83,7 @@ export function replaceExamples(prisma) {
 
 const getExamples = async (node, prisma) => {
   const names = node?.attributes[0].value.split(',')
-  let data = []
+  const data = []
   for (let i = 0; i < names.length; i++) {
     const results = await prisma.example.findUnique({
       where: {

@@ -1,4 +1,4 @@
-export async function revalidate(domain, slug) {
+export async function revalidate(domain: string, slug: any) {
   try {
     await fetch(`${domain}/api/revalidate`, {
       method: 'POST',

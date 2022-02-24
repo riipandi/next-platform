@@ -1,7 +1,12 @@
-import { decode } from 'blurhash'
 import { getImgFromArr } from 'array-to-image'
+import { decode } from 'blurhash'
 
-const saveImage = async (imageData, data, setData) => {
+type SaveImageProps = {
+  imageData: any
+  data: any
+  setData: any
+}
+const saveImage = async ({ imageData, data, setData }: SaveImageProps) => {
   const res = await fetch(`/api/blurhash?url=${imageData.url}`)
   if (res.ok) {
     const blurhash = await res.json()

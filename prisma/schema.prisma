@@ -11,16 +11,16 @@ generator client {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String    @id @default(uuid())
   name          String?
   // if you are using Github OAuth, you can get rid of the username attribute (that is for Twitter OAuth)
   username      String?
   gh_username   String?
   email         String?   @unique
-  emailVerified DateTime?
+  emailVerified DateTime? @map("verified_at")
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
   accounts      Account[]
   sessions      Session[]
   sites         Site[]
@@ -29,11 +29,11 @@ model User {
 }
 
 model Account {
-  id                       String  @id @default(cuid())
-  userId                   String
+  id                       String  @id @default(uuid())
+  userId                   String  @map("user_id")
   type                     String
   provider                 String
-  providerAccountId        String
+  providerAccountId        String  @map("provider_account_id")
   refresh_token            String?
   refresh_token_expires_in Int?
   access_token             String?
@@ -53,8 +53,8 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
+  id           String   @id @default(uuid())
+  sessionToken String   @unique @map("session_token")
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -73,36 +73,36 @@ model VerificationToken {
 }
 
 model Post {
-  id            String   @id @default(cuid())
+  id            String   @id @default(uuid())
   title         String?  @db.Text
   description   String?  @db.Text
   content       String?  @db.LongText
-  slug          String   @default(cuid())
+  slug          String   @default(uuid())
   image         String?  @db.Text
-  imageBlurhash String?  @db.LongText
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  imageBlurhash String?  @map("image_blurhash") @db.LongText
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
   published     Boolean  @default(false)
   site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  siteId        String?
+  siteId        String?  @map("site_id")
 
   @@unique([id, siteId], name: "post_site_constraint")
   @@map("posts")
 }
 
 model Site {
-  id            String   @id @default(cuid())
+  id            String   @id @default(uuid())
   name          String?
   description   String?  @db.Text
   logo          String?
   image         String?  @db.Text
-  imageBlurhash String?  @db.LongText
+  imageBlurhash String?  @map("image_blurhash") @db.LongText
   subdomain     String?  @unique
-  customDomain  String?  @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  customDomain  String?  @unique @map("custom_domain")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
   user          User?    @relation(fields: [userId], references: [id])
-  userId        String?
+  userId        String?  @map("user_id")
   posts         Post[]
 
   @@map("sites")
@@ -112,10 +112,10 @@ model Example {
   id            Int     @id @default(autoincrement())
   name          String?
   description   String? @db.Text
-  domainCount   Int?
+  domainCount   Int?    @map("domain_count")
   url           String?
   image         String? @db.Text
-  imageBlurhash String? @db.LongText
+  imageBlurhash String? @map("image_blurhash") @db.LongText
 
   @@map("examples")
 }

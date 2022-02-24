@@ -1,6 +1,7 @@
-import BlurImage from '../BlurImage'
 import { format } from 'date-fns'
 import { useState } from 'react'
+
+import BlurImage from '../BlurImage'
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
@@ -82,7 +83,7 @@ export default function Tweet({ id, metadata, className }) {
     >
       <div className='flex items-center'>
         <a
-          className='flex h-12 w-12 rounded-full overflow-hidden'
+          className='flex w-12 h-12 overflow-hidden rounded-full'
           href={authorUrl}
           target='_blank'
           rel='noopener noreferrer'
@@ -95,12 +96,12 @@ export default function Tweet({ id, metadata, className }) {
           rel='noopener noreferrer'
           className='author flex flex-col ml-4 !no-underline'
         >
-          <span className='flex items-center font-bold text-gray-900 leading-5 mt-1' title={author.name}>
+          <span className='flex items-center mt-1 font-bold leading-5 text-gray-900' title={author.name}>
             {author.name}
             {author.verified ? (
               <svg
                 aria-label='Verified Account'
-                className='ml-1 text-blue-500 inline h-4 w-4'
+                className='inline w-4 h-4 ml-1 text-blue-500'
                 viewBox='0 0 24 24'
               >
                 <g fill='currentColor'>
@@ -123,19 +124,20 @@ export default function Tweet({ id, metadata, className }) {
         </a>
       </div>
       {repliedTo && repliedTo.username && (
-        <div className='text-gray-500 text-base mt-5'>
+        <div className='mt-5 text-base text-gray-500'>
           Replying to{' '}
           <a
             className='!no-underline !text-[#1da1f2]'
             href={`https://twitter.com/${repliedTo.author.username}`}
             target='_blank'
+            rel='noreferrer noopener'
           >
             @{repliedTo.author.username}
           </a>
         </div>
       )}
       <div
-        className='mt-4 mb-2 leading-normal whitespace-pre-wrap text-lg text-gray-700'
+        className='mt-4 mb-2 text-lg leading-normal text-gray-700 whitespace-pre-wrap'
         dangerouslySetInnerHTML={{ __html: formattedText }}
       />
       {media && media.length ? (
@@ -147,11 +149,11 @@ export default function Tweet({ id, metadata, className }) {
           }
         >
           {media.map((m) => (
-            <a href={tweetUrl} target='_blank'>
+            <a key={m.media_key} href={tweetUrl} target='_blank' rel='noreferrer'>
               {m.type == 'video' || m.type == 'animated_gif' ? (
                 video ? (
                   <video
-                    className='rounded-2xl -mt-10'
+                    className='-mt-10 rounded-2xl'
                     loop
                     width='2048px'
                     height='2048px'
@@ -168,7 +170,7 @@ export default function Tweet({ id, metadata, className }) {
                     width={2048}
                     height={m.height * (2048 / m.width)}
                     src={m.preview_image_url}
-                    className='rounded-2xl hover:brightness-90 transition-all ease-in-out duration-150'
+                    className='transition-all duration-150 ease-in-out rounded-2xl hover:brightness-90'
                   />
                 )
               ) : (
@@ -178,7 +180,7 @@ export default function Tweet({ id, metadata, className }) {
                   width={2048}
                   height={m.height * (2048 / m.width)}
                   src={m.url}
-                  className='rounded-2xl hover:brightness-90 transition-all ease-in-out duration-150'
+                  className='transition-all duration-150 ease-in-out rounded-2xl hover:brightness-90'
                 />
               )}
             </a>
@@ -186,8 +188,8 @@ export default function Tweet({ id, metadata, className }) {
         </div>
       ) : null}
       {url_meta?.images ? (
-        <a className='!no-underline' href={url_meta.unwound_url} target='_blank'>
-          <div className='rounded-2xl overflow-hidden border border-gray-200 drop-shadow-sm mb-5'>
+        <a className='!no-underline' href={url_meta.unwound_url} target='_blank' rel='noreferrer'>
+          <div className='mb-5 overflow-hidden border border-gray-200 rounded-2xl drop-shadow-sm'>
             <BlurImage
               key={url_meta.unwound_url}
               alt={url_meta.title}
@@ -195,9 +197,9 @@ export default function Tweet({ id, metadata, className }) {
               height={1000}
               objectFit='cover'
               src={url_meta.images[0].url}
-              className='hover:brightness-90 transition-all ease-in-out duration-150'
+              className='transition-all duration-150 ease-in-out hover:brightness-90'
             />
-            <div className='w-full bg-white px-8 py-2'>
+            <div className='w-full px-8 py-2 bg-white'>
               <p className='!m-0'>{url_meta.title}</p>
               <p className='text-sm'>{url_meta.description}</p>
             </div>
@@ -211,13 +213,13 @@ export default function Tweet({ id, metadata, className }) {
             return poll.voting_status == 'open' ? (
               <div>
                 {poll.options.map((option) => (
-                  <a href={tweetUrl} target='_blank' className='!no-underline'>
+                  <a href={tweetUrl} target='_blank' className='!no-underline' rel='noreferrer'>
                     <div className='text-center font-bold text-[#1da1f2] border border-[#1da1f2] rounded-3xl my-2 hover:bg-[#1da1f2] hover:bg-opacity-10 transition-all ease-in-out duration-150'>
                       {option.label}
                     </div>
                   </a>
                 ))}
-                <div className='text-gray-500 text-base mt-4'>
+                <div className='mt-4 text-base text-gray-500'>
                   {poll.total_votes} votes · {getRemainingTime(poll.end_datetime)} left
                 </div>
               </div>
@@ -247,7 +249,7 @@ export default function Tweet({ id, metadata, className }) {
                     </div>
                   </>
                 ))}
-                <div className='text-gray-500 text-base mt-4'>{poll.total_votes} votes · Final results</div>
+                <div className='mt-4 text-base text-gray-500'>{poll.total_votes} votes · Final results</div>
               </div>
             )
           })}
@@ -264,7 +266,7 @@ export default function Tweet({ id, metadata, className }) {
           {format(createdAt, 'h:mm a - MMM d, y')}
         </time>
       </a>
-      <div className='border-t border-gray-300 pt-1 flex space-x-2 md:space-x-6 text-base text-gray-700 mt-2'>
+      <div className='flex pt-1 mt-2 space-x-2 text-base text-gray-700 border-t border-gray-300 md:space-x-6'>
         <a
           className='flex items-center !text-gray-500 group transition !no-underline space-x-1'
           href={likeUrl}

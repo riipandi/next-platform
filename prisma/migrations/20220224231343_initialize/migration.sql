@@ -5,10 +5,10 @@ CREATE TABLE `users` (
     `username` VARCHAR(191) NULL,
     `gh_username` VARCHAR(191) NULL,
     `email` VARCHAR(191) NULL,
-    `emailVerified` DATETIME(3) NULL,
+    `verified_at` DATETIME(3) NULL,
     `image` VARCHAR(191) NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `users_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -17,10 +17,10 @@ CREATE TABLE `users` (
 -- CreateTable
 CREATE TABLE `accounts` (
     `id` VARCHAR(191) NOT NULL,
-    `userId` VARCHAR(191) NOT NULL,
+    `user_id` VARCHAR(191) NOT NULL,
     `type` VARCHAR(191) NOT NULL,
     `provider` VARCHAR(191) NOT NULL,
-    `providerAccountId` VARCHAR(191) NOT NULL,
+    `provider_account_id` VARCHAR(191) NOT NULL,
     `refresh_token` VARCHAR(191) NULL,
     `refresh_token_expires_in` INTEGER NULL,
     `access_token` VARCHAR(191) NULL,
@@ -32,19 +32,19 @@ CREATE TABLE `accounts` (
     `oauth_token_secret` VARCHAR(191) NULL,
     `oauth_token` VARCHAR(191) NULL,
 
-    INDEX `accounts_userId_idx`(`userId`),
-    UNIQUE INDEX `accounts_provider_providerAccountId_key`(`provider`, `providerAccountId`),
+    INDEX `accounts_user_id_idx`(`user_id`),
+    UNIQUE INDEX `accounts_provider_provider_account_id_key`(`provider`, `provider_account_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `sessions` (
     `id` VARCHAR(191) NOT NULL,
-    `sessionToken` VARCHAR(191) NOT NULL,
+    `session_token` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `expires` DATETIME(3) NOT NULL,
 
-    UNIQUE INDEX `sessions_sessionToken_key`(`sessionToken`),
+    UNIQUE INDEX `sessions_session_token_key`(`session_token`),
     INDEX `sessions_userId_idx`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -67,13 +67,13 @@ CREATE TABLE `posts` (
     `content` LONGTEXT NULL,
     `slug` VARCHAR(191) NOT NULL,
     `image` TEXT NULL,
-    `imageBlurhash` LONGTEXT NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
+    `image_blurhash` LONGTEXT NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
     `published` BOOLEAN NOT NULL DEFAULT false,
-    `siteId` VARCHAR(191) NULL,
+    `site_id` VARCHAR(191) NULL,
 
-    UNIQUE INDEX `posts_id_siteId_key`(`id`, `siteId`),
+    UNIQUE INDEX `posts_id_site_id_key`(`id`, `site_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -84,15 +84,15 @@ CREATE TABLE `sites` (
     `description` TEXT NULL,
     `logo` VARCHAR(191) NULL,
     `image` TEXT NULL,
-    `imageBlurhash` LONGTEXT NULL,
+    `image_blurhash` LONGTEXT NULL,
     `subdomain` VARCHAR(191) NULL,
-    `customDomain` VARCHAR(191) NULL,
-    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
-    `updatedAt` DATETIME(3) NOT NULL,
-    `userId` VARCHAR(191) NULL,
+    `custom_domain` VARCHAR(191) NULL,
+    `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updated_at` DATETIME(3) NOT NULL,
+    `user_id` VARCHAR(191) NULL,
 
     UNIQUE INDEX `sites_subdomain_key`(`subdomain`),
-    UNIQUE INDEX `sites_customDomain_key`(`customDomain`),
+    UNIQUE INDEX `sites_custom_domain_key`(`custom_domain`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -101,10 +101,10 @@ CREATE TABLE `examples` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NULL,
     `description` TEXT NULL,
-    `domainCount` INTEGER NULL,
+    `domain_count` INTEGER NULL,
     `url` VARCHAR(191) NULL,
     `image` TEXT NULL,
-    `imageBlurhash` LONGTEXT NULL,
+    `image_blurhash` LONGTEXT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

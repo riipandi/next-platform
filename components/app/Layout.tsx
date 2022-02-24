@@ -1,11 +1,13 @@
 import Head from 'next/head'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React from 'react'
 import { signOut } from 'next-auth/react'
-import Loader from './Loader'
+import React from 'react'
+
 import useRequireAuth from '@/libraries/useRequireAuth'
+
+import Loader from './Loader'
 
 export default function Layout({ siteId, children }) {
   const title = 'Platforms on Vercel'
@@ -70,8 +72,9 @@ export default function Layout({ siteId, children }) {
               </button>
             </div>
             <a
-              href='https://github.com/vercel/platforms'
+              href='https://github.com/riipandi/next-platform'
               target='_blank'
+              rel='noreferrer noopener'
               className='flex items-center px-5 py-3 space-x-2 text-gray-700 transition-all duration-150 ease-in-out font-cal sm:hover:text-black sm:hover:bg-white'
             >
               <p className='hidden sm:block'>Build my own</p>

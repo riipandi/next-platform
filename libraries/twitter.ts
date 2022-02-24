@@ -1,9 +1,8 @@
 import querystring from 'querystring'
 
 import { getTwitterMedia } from './twitter-media'
-import { truncate } from './utils'
 
-export const getTweets = async (id) => {
+export const getTweets = async (id: string) => {
   const queryParams = querystring.stringify({
     expansions:
       'author_id,attachments.media_keys,referenced_tweets.id,referenced_tweets.id.author_id,attachments.poll_ids',
@@ -21,17 +20,18 @@ export const getTweets = async (id) => {
   })
 
   const tweet = await response.json()
-
   //console.log(JSON.stringify(tweet, null, 4));
 
-  const getAuthorInfo = (author_id) => {
-    return tweet.includes.users.find((user) => user.id === author_id)
+  const getAuthorInfo = (author_id: any) => {
+    return tweet.includes.users.find((user: any) => user.id === author_id)
   }
 
-  const getReferencedTweets = (mainTweet) => {
+  const getReferencedTweets = (mainTweet: any) => {
     return (
-      mainTweet?.referenced_tweets?.map((referencedTweet) => {
-        const fullReferencedTweet = tweet.includes.tweets.find((tweet) => tweet.id === referencedTweet.id)
+      mainTweet?.referenced_tweets?.map((referencedTweet: any) => {
+        const fullReferencedTweet = tweet.includes.tweets.find(
+          (tweet: any) => tweet.id === referencedTweet.id
+        )
 
         return {
           type: referencedTweet.type,
@@ -44,7 +44,7 @@ export const getTweets = async (id) => {
 
   // function to distinguish between external URLs and external t.co links and internal t.co links
   // (e.g. images, videos, gifs, quote tweets) and remove/replace them accordingly
-  const getExternalUrls = (tweet) => {
+  const getExternalUrls = (tweet: any) => {
     const externalURLs = tweet?.entities?.urls
     const mappings = {}
     if (externalURLs) {
@@ -62,13 +62,13 @@ export const getTweets = async (id) => {
     return processedText
   }
   if (tweet.data) tweet.data.text = getExternalUrls(tweet?.data) // removing/replacing t.co links for main tweet
-  tweet?.includes?.tweets?.map((twt) => {
+  tweet?.includes?.tweets?.map((twt: any) => {
     // removing/replacing t.co links for referenced tweets
     twt.text = getExternalUrls(twt)
   })
 
   const media = tweet.data?.attachments?.media_keys?.map((key) =>
-    tweet.includes.media.find((media) => media.media_key === key)
+    tweet.includes.media.find((media: any) => media.media_key === key)
   )
 
   const referenced_tweets = getReferencedTweets(tweet.data)

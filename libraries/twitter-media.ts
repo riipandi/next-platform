@@ -1,4 +1,4 @@
-export const getTwitterMedia = async (id) => {
+export const getTwitterMedia = async (id: string) => {
   try {
     const response = await fetch(
       `https://api.twitter.com/1.1/statuses/show.json?id=${id}&tweet_mode=extended`,
