@@ -17,8 +17,7 @@ A starter project for Multi-tenant [Next.js](https://nextjs.org/) with [Tailwind
 and [Typescript](https://www.typescriptlang.org/). This starter kit already pre-configured
 with [absolute import](https://jsdev.org/env/nodejs/absolute-path-imports/),
 [TailwindUI](https://tailwindui.com), [Framer Motion](https://www.framer.com/motion/),
-and some [other goodies](./package.json). This starter also provides [Dockerfile](./Dockerfile), just in case you want to
-deploy using containerization or even Kubernetes.
+and some [other goodies](./package.json).
 
 ## Quick Start
 

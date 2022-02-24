@@ -2,7 +2,11 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 const colors = require('tailwindcss/colors')
 
 module.exports = {
-  content: ['./components/**/*.{js,ts,jsx,tsx}', './pages/**/*.{js,ts,jsx,tsx}'],
+  content: [
+    './components/**/*.{js,ts,jsx,tsx}',
+    './pages/**/*.{js,ts,jsx,tsx}',
+    './libraries/**/*.{js,ts,jsx,tsx}'
+  ],
   darkMode: 'class',
   theme: {
     extend: {
@@ -13,10 +17,20 @@ module.exports = {
       screens: {
         standalone: { raw: '(display-mode: standalone)' }
       },
+      width: {
+        1536: '1536px'
+      },
+      height: {
+        150: '37.5rem'
+      },
+      margin: {
+        30: '7.5rem'
+      },
       colors: {
         gray: colors.neutral,
         primary: colors.blue,
-        secondary: colors.indigo
+        secondary: colors.indigo,
+        current: 'currentColor'
       },
       typography: (theme) => ({
         DEFAULT: {
@@ -50,8 +64,8 @@ module.exports = {
               }
             },
             code: { color: theme('colors.indigo.500') },
-            'blockquote p:first-of-type::before': false,
-            'blockquote p:last-of-type::after': false,
+            'blockquote p:first-of-type::before': { content: 'none' },
+            'blockquote p:first-of-type::after': { content: 'none' },
             pre: {
               backgroundColor: theme('colors.gray.100')
             }
@@ -95,7 +109,23 @@ module.exports = {
             }
           }
         }
-      })
+      }),
+      keyframes: {
+        wiggle: {
+          '0%, 100%': {
+            transform: 'translateX(0%)',
+            transformOrigin: '50% 50%'
+          },
+          '15%': { transform: 'translateX(-6px) rotate(-6deg)' },
+          '30%': { transform: 'translateX(9px) rotate(6deg)' },
+          '45%': { transform: 'translateX(-9px) rotate(-3.6deg)' },
+          '60%': { transform: 'translateX(3px) rotate(2.4deg)' },
+          '75%': { transform: 'translateX(-2px) rotate(-1.2deg)' }
+        }
+      },
+      animation: {
+        wiggle: 'wiggle 0.8s both'
+      }
     }
   },
   plugins: [

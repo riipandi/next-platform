@@ -1,10 +1,13 @@
 @tailwind base;
-
-/* Start purging... */
 @tailwind components;
 @tailwind utilities;
 @tailwind variants;
-/* Stop purging. */
+
+@layer utilities {
+  .overflow-hidden {
+    -webkit-mask-image: -webkit-radial-gradient(white, black);
+  }
+}
 
 html,
 body {

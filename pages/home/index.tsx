@@ -8,7 +8,7 @@ import imgSiteIcon from '~/favicon.png'
 export default function Home() {
   return (
     <PageLayout
-      fullTitle='Welcome to your Next site!'
+      fullTitle='Welcome to your Next platform!'
       className='flex flex-col items-center justify-center min-h-screen content-wrapper'
     >
       <div className='mx-auto mb-10'>
@@ -26,15 +26,12 @@ export default function Home() {
             This is a starter for Next.js with Tailwind CSS and Typescript, already pre-configured with
             TailwindUI and some additional components.
           </p>
-          <div className='flex justify-center py-8 mx-auto space-x-4'>
-            <Anchor href='/empty' className='inline-block px-5 text-sm btn btn--primary btn--md'>
-              Empty page
-            </Anchor>
+          <div className='flex justify-center py-6 mx-auto space-x-4'>
             <Anchor
               href='https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Friipandi%2Fnext-platform'
               className='inline-block w-full px-5 text-sm btn btn--outline btn--md'
             >
-              Deploy your own
+              Deploy your own on Vercel
             </Anchor>
           </div>
         </div>
