@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+
 import type { Example, PrismaClient } from '@prisma/client'
 import Link from 'next/link'
 import type { Literal, Node } from 'unist'
@@ -39,6 +42,7 @@ export function replaceTweets<T extends Node>() {
           })
         }
       })
+
       for (const { node } of nodesToChange) {
         try {
           node.type = 'html'

@@ -1,5 +1,4 @@
 import type { GetStaticPaths, GetStaticProps } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { MDXRemote } from 'next-mdx-remote'
@@ -21,7 +20,7 @@ import { replaceExamples, replaceLinks, replaceTweets } from '@/components/remar
 import Layout from '@/components/sites/Layout'
 import Loader from '@/components/sites/Loader'
 
-const components = {
+const components: any = {
   a: replaceLinks,
   BlurImage,
   Examples,
