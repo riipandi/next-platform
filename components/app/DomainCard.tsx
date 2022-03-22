@@ -3,6 +3,7 @@ import { useState } from 'react'
 import useSWR, { mutate } from 'swr'
 import { HttpMethod } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
 import { fetcher } from '@/libraries/fetcher'
 
 import LoadingDots from '@/components/app/loading-dots'
@@ -154,7 +155,7 @@ export default function DomainCard({ data, setData }: DomainCardProps) {
                 <div>
                   <p className='text-sm font-bold'>Value</p>
                   <p className='mt-2 font-mono text-sm'>
-                    {recordType == 'CNAME' ? `cname.mystream.page` : `76.76.21.21`}
+                    {recordType == 'CNAME' ? `cname.${primaryDomain}` : `76.76.21.21`}
                   </p>
                 </div>
               </div>

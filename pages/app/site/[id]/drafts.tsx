@@ -5,6 +5,7 @@ import { useState } from 'react'
 import useSWR from 'swr'
 import { HttpMethod } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
 import { fetcher } from '@/libraries/fetcher'
 
 import Layout from '@/components/app/Layout'
@@ -96,12 +97,12 @@ export default function SiteDrafts() {
                           {post.description || 'No description provided. Click to edit.'}
                         </p>
                         <a
-                          href={`https://${data.site?.subdomain}.mystream.page/${post.slug}`}
+                          href={`https://${data.site?.subdomain}.${primaryDomain}/${post.slug}`}
                           target='_blank'
                           className='absolute px-3 py-1 tracking-wide text-gray-600 bg-gray-200 rounded font-cal bottom-5 left-10 whitespace-nowrap'
                           rel='noreferrer'
                         >
-                          {data.site?.subdomain}.mystream.page/{post.slug} ↗
+                          {data.site?.subdomain}.{primaryDomain}/{post.slug} ↗
                         </a>
                       </div>
                     </div>

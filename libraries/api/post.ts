@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import type { Session } from 'next-auth'
 import type { WithSitePost } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
 import prisma from '@/libraries/prisma'
 import { revalidate } from '@/libraries/revalidate'
 
@@ -155,7 +156,7 @@ export async function deletePost(req: NextApiRequest, res: NextApiResponse): Pro
       }
     })
     if (response) {
-      await revalidate(`https://${response.site?.subdomain}.mystream.page`, response.slug) // revalidate for subdomain
+      await revalidate(`https://${response.site?.subdomain}.${primaryDomain}`, response.slug) // revalidate for subdomain
     }
     if (response?.site?.customDomain) await revalidate(`https://${response.site.customDomain}`, response.slug) // revalidate for custom domain
 
@@ -205,7 +206,7 @@ export async function updatePost(
         published
       }
     })
-    if (subdomain) await revalidate(`https://${subdomain}.mystream.page`, slug) // revalidate for subdomain
+    if (subdomain) await revalidate(`https://${subdomain}.${primaryDomain}`, slug) // revalidate for subdomain
     if (customDomain) await revalidate(`https://${customDomain}`, slug) // revalidate for custom domain
 
     return res.status(200).json(post)

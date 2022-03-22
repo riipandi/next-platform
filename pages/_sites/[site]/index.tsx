@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import type { ParsedUrlQuery } from 'querystring'
 import type { _SiteData, Meta } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
 import prisma from '@/libraries/prisma'
 
 import BlogCard from '@/components/BlogCard'
@@ -31,7 +32,7 @@ export default function Index({ stringifiedData }: IndexProps) {
     description: data.description,
     logo: '/logo.png',
     ogImage: data.image,
-    ogUrl: data.customDomain ? data.customDomain : `https://${data.subdomain}.mystream.page`
+    ogUrl: data.customDomain ? data.customDomain : `https://${data.subdomain}.${primaryDomain}`
   } as Meta
 
   return (

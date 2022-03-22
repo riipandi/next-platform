@@ -8,6 +8,7 @@ import useSWR from 'swr'
 import { useDebounce } from 'use-debounce'
 import { HttpMethod } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
 import { fetcher } from '@/libraries/fetcher'
 
 import Layout from '@/components/app/Layout'
@@ -34,7 +35,7 @@ export default function AppIndex() {
         if (available) {
           setError(null)
         } else {
-          setError(`${debouncedSubdomain}.mystream.page`)
+          setError(`${debouncedSubdomain}.${primaryDomain}`)
         }
       }
     }
@@ -101,7 +102,7 @@ export default function AppIndex() {
                 type='text'
               />
               <span className='flex items-center h-full px-5 bg-gray-100 border-l border-gray-600 rounded-r-lg'>
-                .mystream.page
+                .{primaryDomain}
               </span>
             </div>
             {error && (
@@ -184,12 +185,12 @@ export default function AppIndex() {
                         <p className='my-5 text-base line-clamp-3'>{site.description}</p>
                         <a
                           onClick={(e) => e.stopPropagation()}
-                          href={`https://${site.subdomain}.mystream.page`}
+                          href={`https://${site.subdomain}.${primaryDomain}`}
                           target='_blank'
                           className='absolute px-3 py-1 tracking-wide text-gray-600 bg-gray-200 rounded font-cal bottom-5 left-10 whitespace-nowrap'
                           rel='noreferrer'
                         >
-                          {site.subdomain}.mystream.page ↗
+                          {site.subdomain}.{primaryDomain} ↗
                         </a>
                       </div>
                     </div>

@@ -8,6 +8,7 @@ import { useDebounce } from 'use-debounce'
 import type { WithSitePost } from '@/types'
 import { HttpMethod } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
 import { fetcher } from '@/libraries/fetcher'
 
 import Layout from '@/components/app/Layout'
@@ -185,7 +186,7 @@ export default function Post() {
 
       if (response.ok) {
         mutate(`/api/post?postId=${postId}`)
-        router.push(`https://${post?.site?.subdomain}.mystream.page/${post?.slug}`)
+        router.push(`https://${post?.site?.subdomain}.${primaryDomain}/${post?.slug}`)
       }
     } catch (error) {
       console.error(error)

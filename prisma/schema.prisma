@@ -19,21 +19,23 @@ model User {
   username      String?
   gh_username   String?
   email         String?   @unique
-  emailVerified DateTime?
+  emailVerified DateTime? @map("verified_at")
   image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
   accounts      Account[]
   sessions      Session[]
   sites         Site[]
+
+  @@map("users")
 }
 
 model Account {
   id                       String  @id @default(cuid())
-  userId                   String
+  userId                   String  @map("user_id")
   type                     String
   provider                 String
-  providerAccountId        String
+  providerAccountId        String  @map("provider_account_id")
   refresh_token            String?
   refresh_token_expires_in Int?
   access_token             String?
@@ -49,16 +51,18 @@ model Account {
 
   @@unique([provider, providerAccountId])
   @@index([userId])
+  @@map("accounts")
 }
 
 model Session {
   id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@map("sessions")
 }
 
 model VerificationToken {
@@ -67,6 +71,7 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
 model Post {
@@ -76,14 +81,15 @@ model Post {
   content       String?  @db.LongText
   slug          String   @default(cuid())
   image         String?  @db.Text
-  imageBlurhash String?  @db.LongText
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  imageBlurhash String?  @map("image_blurhash") @db.LongText
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
   published     Boolean  @default(false)
   site          Site?    @relation(fields: [siteId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   siteId        String?
 
   @@unique([id, siteId], name: "post_site_constraint")
+  @@map("posts")
 }
 
 model Site {
@@ -92,22 +98,26 @@ model Site {
   description   String?  @db.Text
   logo          String?
   image         String?  @db.Text
-  imageBlurhash String?  @db.LongText
+  imageBlurhash String?  @map("image_blurhash") @db.LongText
   subdomain     String?  @unique
-  customDomain  String?  @unique
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  customDomain  String?  @unique @map("custom_domain")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
   user          User?    @relation(fields: [userId], references: [id])
-  userId        String?
+  userId        String?  @map("user_id")
   posts         Post[]
+
+  @@map("sites")
 }
 
 model Example {
   id            Int     @id @default(autoincrement())
   name          String?
   description   String? @db.Text
-  domainCount   Int?
+  domainCount   Int?    @map("domain_count")
   url           String?
   image         String? @db.Text
-  imageBlurhash String? @db.LongText
+  imageBlurhash String? @map("image_blurhash") @db.LongText
+
+  @@map("examples")
 }

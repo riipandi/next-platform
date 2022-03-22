@@ -7,6 +7,7 @@ import useSWR, { mutate } from 'swr'
 import { useDebounce } from 'use-debounce'
 import { HttpMethod } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
 import { fetcher } from '@/libraries/fetcher'
 import saveImage from '@/libraries/save-image'
 
@@ -120,7 +121,7 @@ export default function SiteSettings() {
 
         const available = await response.json()
 
-        setSubdomainError(available ? null : `${debouncedSubdomain}.mystream.page`)
+        setSubdomainError(available ? null : `${debouncedSubdomain}.${primaryDomain}`)
       } catch (error) {
         console.error(error)
       }
@@ -220,7 +221,7 @@ export default function SiteSettings() {
                 value={data.subdomain ?? 'Unknown Subdomain'}
               />
               <div className='flex items-center justify-center w-1/2 h-12 bg-gray-100 border-l border-gray-600 rounded-r-lg font-cal'>
-                mystream.page
+                {primaryDomain}
               </div>
             </div>
             {subdomainError && (

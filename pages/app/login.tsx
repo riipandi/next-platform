@@ -4,6 +4,8 @@ import { signIn } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 
+import { primaryDomain } from '@/libraries/config'
+
 import LoadingDots from '@/components/app/loading-dots'
 
 const pageTitle = 'Login'
@@ -57,7 +59,7 @@ export default function Login() {
         <p className='mt-2 text-sm text-center text-gray-600'>
           Build multi-tenant applications with custom domains. <br /> Read the{' '}
           <a
-            href='https://demo.mystream.page/platforms-starter-kit'
+            href={`https://demo.${primaryDomain}/platforms-starter-kit`}
             target='_blank'
             className='font-medium text-black hover:text-gray-800'
             rel='noreferrer'

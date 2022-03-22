@@ -9,6 +9,7 @@ import { remark } from 'remark'
 import remarkMdx from 'remark-mdx'
 import type { _SiteSlugData, AdjacentPost, Meta } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
 import prisma from '@/libraries/prisma'
 
 import BlogCard from '@/components/BlogCard'
@@ -50,7 +51,7 @@ export default function Post({ stringifiedAdjacentPosts, stringifiedData }: Post
     description: data.description,
     logo: '/logo.png',
     ogImage: data.image,
-    ogUrl: `https://${data.site?.subdomain}.mystream.page/${data.slug}`,
+    ogUrl: `https://${data.site?.subdomain}.${primaryDomain}/${data.slug}`,
     title: data.title
   } as Meta
 
@@ -267,7 +268,7 @@ async function getMdxSource(postContents: string) {
     .use(remarkMdx)
     // Replaces tweets with static <Tweet /> component
     .use(replaceTweets)
-    // Replaces examples with <Example /> component (only for demo.mystream.page)
+    // Replaces examples with <Example /> component (only for demo.PRIMARY_DOMAIN)
     .use(() => replaceExamples(prisma))
     .process(postContents)
 

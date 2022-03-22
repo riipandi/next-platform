@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import type { Meta, WithChildren } from '@/types'
 
+import { primaryDomain } from '@/libraries/config'
+
 interface LayoutProps extends WithChildren {
   meta?: Meta
   siteId?: string
@@ -132,7 +134,7 @@ export default function Layout({ meta, children, subdomain }: LayoutProps) {
             } flex space-y-3 sm:space-y-0 sm:space-x-3 sm:flex-row flex-col lg:w-auto w-full text-center`}
           >
             <a
-              href='https://app.mystream.page'
+              href={`https://app.${primaryDomain}`}
               target='_blank'
               className='flex-auto px-5 py-1 text-lg text-black whitespace-no-wrap transition-all duration-150 ease-in-out border border-gray-200 rounded-md font-cal sm:py-3 hover:border-black'
               rel='noreferrer'
