@@ -1,6 +1,6 @@
-import { decode } from "blurhash";
+import { decode } from 'blurhash';
 
-import type { CloudinaryCallbackImage, UserSettings } from "@/types";
+import type { CloudinaryCallbackImage, UserSettings } from '@/types';
 
 export async function saveImage<U = UserSettings | null>(
   imageData: CloudinaryCallbackImage,
@@ -18,7 +18,7 @@ export async function saveImage<U = UserSettings | null>(
       setData({
         ...data,
         image: imageData.url,
-        imageBlurhash: image.src,
+        imageBlurhash: image.src
       });
     }
   } catch (error) {
@@ -42,17 +42,13 @@ export default saveImage;
  *
  * @returns
  */
-export function getImgFromArr(
-  arr: Uint8ClampedArray,
-  width: number,
-  height: number
-): HTMLImageElement {
-  if (typeof width === "undefined" || typeof height === "undefined") {
+export function getImgFromArr(arr: Uint8ClampedArray, width: number, height: number): HTMLImageElement {
+  if (typeof width === 'undefined' || typeof height === 'undefined') {
     width = height = Math.sqrt(arr.length / 4);
   }
 
-  const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
 
   canvas.width = width;
   canvas.height = height;
@@ -63,7 +59,7 @@ export function getImgFromArr(
     ctx.putImageData(imgData, 0, 0);
   }
 
-  const img = document.createElement("img");
+  const img = document.createElement('img');
   img.src = canvas.toDataURL();
 
   return img;

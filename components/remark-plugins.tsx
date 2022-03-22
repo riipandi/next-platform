@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 
-import type { Example, PrismaClient } from '@prisma/client'
-import Link from 'next/link'
-import type { Literal, Node } from 'unist'
-import * as visit from 'unist-util-visit'
-import type { WithChildren } from '@/types'
+import type { Example, PrismaClient } from '@prisma/client';
+import Link from 'next/link';
+import type { Literal, Node } from 'unist';
+import visit from 'unist-util-visit';
+import type { WithChildren } from '@/types';
 
-import { getTweets } from '@/libraries/twitter'
+import { getTweets } from '@/libraries/twitter';
 
 interface NodesToChange {
-  node: Literal<string>
+  node: Literal<string>;
 }
 
 export function replaceLinks(options: { href: string } & WithChildren) {
@@ -25,13 +25,13 @@ export function replaceLinks(options: { href: string } & WithChildren) {
     <a href={options.href} target='_blank' rel='noopener noreferrer'>
       {options.children} ↗
     </a>
-  )
+  );
 }
 
 export function replaceTweets<T extends Node>() {
   return (tree: T) =>
     new Promise<void>(async (resolve, reject) => {
-      const nodesToChange = new Array<NodesToChange>()
+      const nodesToChange = new Array<NodesToChange>();
 
       visit(tree, 'text', (node: any) => {
         if (
@@ -39,80 +39,80 @@ export function replaceTweets<T extends Node>() {
         ) {
           nodesToChange.push({
             node
-          })
+          });
         }
-      })
+      });
 
       for (const { node } of nodesToChange) {
         try {
-          node.type = 'html'
-          const mdx = await getTweet(node)
-          node.value = mdx
+          node.type = 'html';
+          const mdx = await getTweet(node);
+          node.value = mdx;
         } catch (e) {
-          console.log('ERROR', e)
-          return reject(e)
+          console.log('ERROR', e);
+          return reject(e);
         }
       }
 
-      resolve()
-    })
+      resolve();
+    });
 }
 
 async function getTweet(node: Literal<string>) {
-  const regex = /\/status\/(\d+)/gm
+  const regex = /\/status\/(\d+)/gm;
 
-  const matches = regex.exec(node.value)
-  if (!matches) throw new Error(`Failed to get tweet: ${node}`)
+  const matches = regex.exec(node.value);
+  if (!matches) throw new Error(`Failed to get tweet: ${node}`);
 
-  const id = matches[1]
+  const id = matches[1];
 
-  const tweetData = await getTweets(id)
+  const tweetData = await getTweets(id);
 
-  node.value = "<Tweet id='" + id + "' metadata={`" + JSON.stringify(tweetData) + '`}/>'
+  node.value = "<Tweet id='" + id + "' metadata={`" + JSON.stringify(tweetData) + '`}/>';
 
-  return node.value
+  return node.value;
 }
 
 export function replaceExamples<T extends Node>(prisma: PrismaClient) {
   return (tree: T) =>
     new Promise<void>(async (resolve, reject) => {
-      const nodesToChange = new Array<NodesToChange>()
+      const nodesToChange = new Array<NodesToChange>();
 
       visit(tree, 'mdxJsxFlowElement', (node: any) => {
         if (node.name == 'Examples') {
           nodesToChange.push({
             node
-          })
+          });
         }
-      })
+      });
       for (const { node } of nodesToChange) {
         try {
-          node.type = 'html'
-          const mdx = await getExamples(node, prisma)
-          node.value = mdx
+          node.type = 'html';
+          const mdx = await getExamples(node, prisma);
+          node.value = mdx;
         } catch (e) {
-          console.log('ERROR', e)
-          return reject(e)
+          console.log('ERROR', e);
+          return reject(e);
         }
       }
 
-      resolve()
-    })
+      resolve();
+    });
 }
 
 async function getExamples(node: any, prisma: PrismaClient) {
-  const names = node?.attributes[0].value.split(',')
+  const names = node?.attributes[0].value.split(',');
 
-  const data = new Array<Example | null>()
+  const data = new Array<Example | null>();
 
   for (let i = 0; i < names.length; i++) {
     const results = await prisma.example.findUnique({
       where: {
         id: parseInt(names[i])
       }
-    })
-    data.push(results)
+    });
+    data.push(results);
   }
 
-  return `<Examples data={${JSON.stringify(data)}} />`
+  return `<Examples data={${JSON.stringify(data)}} />`;
 }

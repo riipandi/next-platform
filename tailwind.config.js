@@ -1,4 +1,4 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
   content: ['./components/**/*.{js,ts,jsx,tsx}', './pages/**/*.{js,ts,jsx,tsx}'],
@@ -66,4 +66,4 @@ module.exports = {
     require('@tailwindcss/typography'),
     require('@tailwindcss/line-clamp')
   ]
-}
+};

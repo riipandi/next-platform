@@ -1,8 +1,8 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { HttpMethod } from '@/types'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { HttpMethod } from '@/types';
 
 export default async function requestDelegation(req: NextApiRequest, res: NextApiResponse) {
-  const { domain } = req.query
+  const { domain } = req.query;
 
   try {
     const response = await fetch(
@@ -14,11 +14,11 @@ export default async function requestDelegation(req: NextApiRequest, res: NextAp
         },
         method: HttpMethod.POST
       }
-    )
+    );
 
-    res.status(response.ok ? 200 : 403).end()
+    res.status(response.ok ? 200 : 403).end();
   } catch (error) {
-    console.error(error)
-    res.status(500).end(error)
+    console.error(error);
+    res.status(500).end(error);
   }
 }

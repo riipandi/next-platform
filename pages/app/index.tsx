@@ -1,53 +1,53 @@
-import type { Site } from '@prisma/client'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useSession } from 'next-auth/react'
-import type { FormEvent } from 'react'
-import { useEffect, useRef, useState } from 'react'
-import useSWR from 'swr'
-import { useDebounce } from 'use-debounce'
-import { HttpMethod } from '@/types'
+import type { Site } from '@prisma/client';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import type { FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import useSWR from 'swr';
+import { useDebounce } from 'use-debounce';
+import { HttpMethod } from '@/types';
 
-import { primaryDomain } from '@/libraries/config'
-import { fetcher } from '@/libraries/fetcher'
+import { primaryDomain } from '@/libraries/config';
+import { fetcher } from '@/libraries/fetcher';
 
-import Layout from '@/components/app/Layout'
-import LoadingDots from '@/components/app/loading-dots'
-import BlurImage from '@/components/BlurImage'
-import Modal from '@/components/Modal'
+import Layout from '@/components/app/Layout';
+import LoadingDots from '@/components/app/loading-dots';
+import BlurImage from '@/components/BlurImage';
+import Modal from '@/components/Modal';
 
 export default function AppIndex() {
-  const [showModal, setShowModal] = useState<boolean>(false)
-  const [creatingSite, setCreatingSite] = useState<boolean>(false)
-  const [subdomain, setSubdomain] = useState<string>('')
-  const [debouncedSubdomain] = useDebounce(subdomain, 1500)
-  const [error, setError] = useState<string | null>(null)
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [creatingSite, setCreatingSite] = useState<boolean>(false);
+  const [subdomain, setSubdomain] = useState<string>('');
+  const [debouncedSubdomain] = useDebounce(subdomain, 1500);
+  const [error, setError] = useState<string | null>(null);
 
-  const siteNameRef = useRef<HTMLInputElement | null>(null)
-  const siteSubdomainRef = useRef<HTMLInputElement | null>(null)
-  const siteDescriptionRef = useRef<HTMLTextAreaElement | null>(null)
+  const siteNameRef = useRef<HTMLInputElement | null>(null);
+  const siteSubdomainRef = useRef<HTMLInputElement | null>(null);
+  const siteDescriptionRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     async function checkSubDomain() {
       if (debouncedSubdomain.length > 0) {
-        const response = await fetch(`/api/domain/check?domain=${debouncedSubdomain}&subdomain=1`)
-        const available = await response.json()
+        const response = await fetch(`/api/domain/check?domain=${debouncedSubdomain}&subdomain=1`);
+        const available = await response.json();
         if (available) {
-          setError(null)
+          setError(null);
         } else {
-          setError(`${debouncedSubdomain}.${primaryDomain}`)
+          setError(`${debouncedSubdomain}.${primaryDomain}`);
         }
       }
     }
-    checkSubDomain()
-  }, [debouncedSubdomain])
+    checkSubDomain();
+  }, [debouncedSubdomain]);
 
-  const router = useRouter()
+  const router = useRouter();
 
-  const { data: session } = useSession()
-  const sessionId = session?.user?.id
+  const { data: session } = useSession();
+  const sessionId = session?.user?.id;
 
-  const { data: sites } = useSWR<Array<Site>>(sessionId && `/api/site`, fetcher)
+  const { data: sites } = useSWR<Array<Site>>(sessionId && `/api/site`, fetcher);
 
   async function createSite(e: FormEvent<HTMLFormElement>) {
     const res = await fetch('/api/site', {
@@ -61,10 +61,10 @@ export default function AppIndex() {
         subdomain: siteSubdomainRef.current?.value,
         description: siteDescriptionRef.current?.value
       })
-    })
+    });
     if (res.ok) {
-      const data = await res.json()
-      router.push(`/site/${data.siteId}`)
+      const data = await res.json();
+      router.push(`/site/${data.siteId}`);
     }
   }
 
@@ -73,9 +73,9 @@ export default function AppIndex() {
       <Modal showModal={showModal} setShowModal={setShowModal}>
         <form
           onSubmit={(event) => {
-            event.preventDefault()
-            setCreatingSite(true)
-            createSite(event)
+            event.preventDefault();
+            setCreatingSite(true);
+            createSite(event);
           }}
           className='inline-block w-full max-w-md pt-8 overflow-hidden text-center align-middle transition-all bg-white rounded-lg shadow-xl'
         >
@@ -127,8 +127,8 @@ export default function AppIndex() {
               type='button'
               className='w-full px-5 py-5 text-sm text-gray-600 transition-all duration-150 ease-in-out border-t border-gray-300 rounded-bl hover:text-black focus:outline-none focus:ring-0'
               onClick={() => {
-                setError(null)
-                setShowModal(false)
+                setError(null);
+                setShowModal(false);
               }}
             >
               CANCEL
@@ -234,5 +234,5 @@ export default function AppIndex() {
         </div>
       </div>
     </Layout>
-  )
+  );
 }

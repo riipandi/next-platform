@@ -1,29 +1,29 @@
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { signIn } from 'next-auth/react'
-import { useEffect, useState } from 'react'
-import toast, { Toaster } from 'react-hot-toast'
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 
-import { primaryDomain } from '@/libraries/config'
+import { primaryDomain } from '@/libraries/config';
 
-import LoadingDots from '@/components/app/loading-dots'
+import LoadingDots from '@/components/app/loading-dots';
 
-const pageTitle = 'Login'
-const logo = '/favicon.ico'
+const pageTitle = 'Login';
+const logo = '/favicon.ico';
 const description =
-  'Platforms Starter Kit is a comprehensive template for building multi-tenant applications with custom domains.'
+  'Platforms Starter Kit is a comprehensive template for building multi-tenant applications with custom domains.';
 
 export default function Login() {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   // Get error message added by next/auth in URL.
-  const { query } = useRouter()
-  const { error } = query
+  const { query } = useRouter();
+  const { error } = query;
 
   useEffect(() => {
-    const errorMessage = Array.isArray(error) ? error.pop() : error
-    errorMessage && toast.error(errorMessage)
-  }, [error])
+    const errorMessage = Array.isArray(error) ? error.pop() : error;
+    errorMessage && toast.error(errorMessage);
+  }, [error]);
 
   return (
     <div className='flex flex-col justify-center min-h-screen py-12 bg-gray-100 sm:px-6 lg:px-8'>
@@ -74,8 +74,8 @@ export default function Login() {
           <button
             disabled={loading}
             onClick={() => {
-              setLoading(true)
-              signIn('github')
+              setLoading(true);
+              signIn('github');
             }}
             className={`${
               loading ? 'cursor-not-allowed bg-gray-600' : 'bg-black'
@@ -98,5 +98,5 @@ export default function Login() {
       </div>
       <Toaster />
     </div>
-  )
+  );
 }

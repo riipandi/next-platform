@@ -1,31 +1,31 @@
-import type { GetStaticPaths, GetStaticProps } from 'next'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import type { ParsedUrlQuery } from 'querystring'
-import type { _SiteData, Meta } from '@/types'
+import type { GetStaticPaths, GetStaticProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import type { ParsedUrlQuery } from 'querystring';
+import type { _SiteData, Meta } from '@/types';
 
-import { primaryDomain } from '@/libraries/config'
-import prisma from '@/libraries/prisma'
+import { primaryDomain } from '@/libraries/config';
+import prisma from '@/libraries/prisma';
 
-import BlogCard from '@/components/BlogCard'
-import BlurImage from '@/components/BlurImage'
-import Date from '@/components/Date'
-import Layout from '@/components/sites/Layout'
-import Loader from '@/components/sites/Loader'
+import BlogCard from '@/components/BlogCard';
+import BlurImage from '@/components/BlurImage';
+import Date from '@/components/Date';
+import Layout from '@/components/sites/Layout';
+import Loader from '@/components/sites/Loader';
 
 interface PathProps extends ParsedUrlQuery {
-  site: string
+  site: string;
 }
 
 interface IndexProps {
-  stringifiedData: string
+  stringifiedData: string;
 }
 
 export default function Index({ stringifiedData }: IndexProps) {
-  const router = useRouter()
-  if (router.isFallback) return <Loader />
+  const router = useRouter();
+  if (router.isFallback) return <Loader />;
 
-  const data = JSON.parse(stringifiedData) as _SiteData
+  const data = JSON.parse(stringifiedData) as _SiteData;
 
   const meta = {
     title: data.name,
@@ -33,7 +33,7 @@ export default function Index({ stringifiedData }: IndexProps) {
     logo: '/logo.png',
     ogImage: data.image,
     ogUrl: data.customDomain ? data.customDomain : `https://${data.subdomain}.${primaryDomain}`
-  } as Meta
+  } as Meta;
 
   return (
     <Layout meta={meta} subdomain={data.subdomain ?? undefined}>
@@ -115,7 +115,7 @@ export default function Index({ stringifiedData }: IndexProps) {
         </div>
       )}
     </Layout>
-  )
+  );
 }
 
 export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
@@ -141,12 +141,12 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
         customDomain: true
       }
     })
-  ])
+  ]);
 
   const allPaths = [
     ...subdomains.map(({ subdomain }) => subdomain),
     ...customDomains.map(({ customDomain }) => customDomain)
-  ].filter((path) => path) as Array<string>
+  ].filter((path) => path) as Array<string>;
 
   return {
     paths: allPaths.map((path) => ({
@@ -155,25 +155,25 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
       }
     })),
     fallback: true
-  }
-}
+  };
+};
 
 export const getStaticProps: GetStaticProps<IndexProps, PathProps> = async ({ params }) => {
-  if (!params) throw new Error('No path parameters found')
+  if (!params) throw new Error('No path parameters found');
 
-  const { site } = params
+  const { site } = params;
 
   let filter: {
-    subdomain?: string
-    customDomain?: string
+    subdomain?: string;
+    customDomain?: string;
   } = {
     subdomain: site
-  }
+  };
 
   if (site.includes('.')) {
     filter = {
       customDomain: site
-    }
+    };
   }
 
   const data = (await prisma.site.findUnique({
@@ -191,14 +191,14 @@ export const getStaticProps: GetStaticProps<IndexProps, PathProps> = async ({ pa
         ]
       }
     }
-  })) as _SiteData
+  })) as _SiteData;
 
-  if (!data) return { notFound: true, revalidate: 10 }
+  if (!data) return { notFound: true, revalidate: 10 };
 
   return {
     props: {
       stringifiedData: JSON.stringify(data)
     },
     revalidate: 3600
-  }
-}
+  };
+};

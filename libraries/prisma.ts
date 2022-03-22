@@ -1,11 +1,11 @@
-import { PrismaClient } from '@prisma/client'
-import invariant from 'tiny-invariant'
+import { PrismaClient } from '@prisma/client';
+import invariant from 'tiny-invariant';
 
-let prisma: PrismaClient
+let prisma: PrismaClient;
 
 declare global {
   // eslint-disable-next-line no-var
-  var __db__: PrismaClient
+  var __db__: PrismaClient;
 }
 
 // this is needed because in development we don't want to restart
@@ -13,21 +13,21 @@ declare global {
 // create a new connection to the DB with every change either.
 // in production we'll have a single connection to the DB.
 if (process.env.NODE_ENV === 'production') {
-  prisma = getClient()
+  prisma = getClient();
 } else {
   if (!global.__db__) {
-    global.__db__ = getClient()
+    global.__db__ = getClient();
   }
-  prisma = global.__db__
+  prisma = global.__db__;
 }
 
 function getClient() {
-  const { DATABASE_URL } = process.env
-  invariant(typeof DATABASE_URL === 'string', 'DATABASE_URL env var not set')
+  const { DATABASE_URL } = process.env;
+  invariant(typeof DATABASE_URL === 'string', 'DATABASE_URL env var not set');
 
-  const databaseUrl = new URL(DATABASE_URL)
+  const databaseUrl = new URL(DATABASE_URL);
 
-  console.info(`🔌 setting up prisma client to ${databaseUrl.host}`)
+  console.info(`🔌 setting up prisma client to ${databaseUrl.host}`);
   // NOTE: during development if you change anything in this function, remember
   // that this only runs once per server restart and won't automatically be
   // re-run per request like everything else is. So if you need to change
@@ -38,11 +38,11 @@ function getClient() {
         url: databaseUrl.toString()
       }
     }
-  })
+  });
   // connect eagerly
-  client.$connect()
+  client.$connect();
 
-  return client
+  return client;
 }
 
-export default prisma
+export default prisma;

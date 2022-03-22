@@ -1,9 +1,9 @@
-import type { WithClassName } from '@/types'
+import type { WithClassName } from '@/types';
 
 interface LogoProps extends WithClassName {
-  color: string
-  height?: number
-  width: number
+  color: string;
+  height?: number;
+  width: number;
 }
 
 const Logo = (props: LogoProps) => {
@@ -22,7 +22,7 @@ const Logo = (props: LogoProps) => {
         </g>
       </g>
     </svg>
-  )
-}
+  );
+};
 
-export default Logo
+export default Logo;

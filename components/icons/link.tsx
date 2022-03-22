@@ -1,7 +1,7 @@
-import React from 'react'
-import type { BaseIconProps } from '@/types'
+import React from 'react';
+import type { BaseIconProps } from '@/types';
 
-type LinkIconProps = BaseIconProps
+type LinkIconProps = BaseIconProps;
 
 function LinkIcon({ className, color, height, width }: LinkIconProps) {
   return (
@@ -24,7 +24,7 @@ function LinkIcon({ className, color, height, width }: LinkIconProps) {
         className='st0'
       ></path>
     </svg>
-  )
+  );
 }
 
-export default LinkIcon
+export default LinkIcon;

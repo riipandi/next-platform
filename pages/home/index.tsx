@@ -1,5 +1,5 @@
-import Head from 'next/head'
-import Image from 'next/image'
+import Head from 'next/head';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -13,5 +13,5 @@ export default function Home() {
         <Image width={512} height={512} src='/logo.png' alt='Platforms on Vercel' />
       </div>
     </div>
-  )
+  );
 }

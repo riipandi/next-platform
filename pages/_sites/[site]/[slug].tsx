@@ -1,50 +1,50 @@
-import type { GetStaticPaths, GetStaticProps } from 'next'
-import { useRouter } from 'next/router'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { MDXRemote } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
-import type { ParsedUrlQuery } from 'querystring'
-import { remark } from 'remark'
-import remarkMdx from 'remark-mdx'
-import type { _SiteSlugData, AdjacentPost, Meta } from '@/types'
+import type { GetStaticPaths, GetStaticProps } from 'next';
+import { useRouter } from 'next/router';
+import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
+import { MDXRemote } from 'next-mdx-remote';
+import { serialize } from 'next-mdx-remote/serialize';
+import type { ParsedUrlQuery } from 'querystring';
+import { remark } from 'remark';
+import remarkMdx from 'remark-mdx';
+import type { _SiteSlugData, AdjacentPost, Meta } from '@/types';
 
-import { primaryDomain } from '@/libraries/config'
-import prisma from '@/libraries/prisma'
+import { primaryDomain } from '@/libraries/config';
+import prisma from '@/libraries/prisma';
 
-import BlogCard from '@/components/BlogCard'
-import BlurImage from '@/components/BlurImage'
-import Date from '@/components/Date'
-import Examples from '@/components/mdx/Examples'
-import Tweet from '@/components/mdx/Tweet'
-import { replaceExamples, replaceLinks, replaceTweets } from '@/components/remark-plugins'
-import Layout from '@/components/sites/Layout'
-import Loader from '@/components/sites/Loader'
+import BlogCard from '@/components/BlogCard';
+import BlurImage from '@/components/BlurImage';
+import Date from '@/components/Date';
+import Examples from '@/components/mdx/Examples';
+import Tweet from '@/components/mdx/Tweet';
+import { replaceExamples, replaceLinks, replaceTweets } from '@/components/remark-plugins';
+import Layout from '@/components/sites/Layout';
+import Loader from '@/components/sites/Loader';
 
 const components: any = {
   a: replaceLinks,
   BlurImage,
   Examples,
   Tweet
-}
+};
 
 interface PathProps extends ParsedUrlQuery {
-  site: string
-  slug: string
+  site: string;
+  slug: string;
 }
 
 interface PostProps {
-  stringifiedData: string
-  stringifiedAdjacentPosts: string
+  stringifiedData: string;
+  stringifiedAdjacentPosts: string;
 }
 
 export default function Post({ stringifiedAdjacentPosts, stringifiedData }: PostProps) {
-  const router = useRouter()
-  if (router.isFallback) return <Loader />
+  const router = useRouter();
+  if (router.isFallback) return <Loader />;
 
   const data = JSON.parse(stringifiedData) as _SiteSlugData & {
-    mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>
-  }
-  const adjacentPosts = JSON.parse(stringifiedAdjacentPosts) as Array<AdjacentPost>
+    mdxSource: MDXRemoteSerializeResult<Record<string, unknown>>;
+  };
+  const adjacentPosts = JSON.parse(stringifiedAdjacentPosts) as Array<AdjacentPost>;
 
   const meta = {
     description: data.description,
@@ -52,7 +52,7 @@ export default function Post({ stringifiedAdjacentPosts, stringifiedData }: Post
     ogImage: data.image,
     ogUrl: `https://${data.site?.subdomain}.${primaryDomain}/${data.slug}`,
     title: data.title
-  } as Meta
+  } as Meta;
 
   return (
     <Layout meta={meta} subdomain={data.site?.subdomain ?? undefined}>
@@ -134,7 +134,7 @@ export default function Post({ stringifiedAdjacentPosts, stringifiedData }: Post
         </div>
       )}
     </Layout>
-  )
+  );
 }
 
 export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
@@ -155,11 +155,11 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
         }
       }
     }
-  })
+  });
 
   return {
     paths: posts.flatMap((post) => {
-      if (post.site === null || post.site.subdomain === null) return []
+      if (post.site === null || post.site.subdomain === null) return [];
 
       if (post.site.customDomain) {
         return [
@@ -175,36 +175,36 @@ export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
               slug: post.slug
             }
           }
-        ]
+        ];
       } else {
         return {
           params: {
             site: post.site.subdomain,
             slug: post.slug
           }
-        }
+        };
       }
     }),
     fallback: true
-  }
-}
+  };
+};
 
 export const getStaticProps: GetStaticProps<PostProps, PathProps> = async ({ params }) => {
-  if (!params) throw new Error('No path parameters found')
+  if (!params) throw new Error('No path parameters found');
 
-  const { site, slug } = params
+  const { site, slug } = params;
 
   let filter: {
-    subdomain?: string
-    customDomain?: string
+    subdomain?: string;
+    customDomain?: string;
   } = {
     subdomain: site
-  }
+  };
 
   if (site.includes('.')) {
     filter = {
       customDomain: site
-    }
+    };
   }
 
   const data = (await prisma.post.findFirst({
@@ -221,9 +221,9 @@ export const getStaticProps: GetStaticProps<PostProps, PathProps> = async ({ par
         }
       }
     }
-  })) as _SiteSlugData | null
+  })) as _SiteSlugData | null;
 
-  if (!data) return { notFound: true, revalidate: 10 }
+  if (!data) return { notFound: true, revalidate: 10 };
 
   const [mdxSource, adjacentPosts] = await Promise.all([
     getMdxSource(data.content!),
@@ -246,7 +246,7 @@ export const getStaticProps: GetStaticProps<PostProps, PathProps> = async ({ par
         imageBlurhash: true
       }
     })
-  ])
+  ]);
 
   return {
     props: {
@@ -257,8 +257,8 @@ export const getStaticProps: GetStaticProps<PostProps, PathProps> = async ({ par
       stringifiedAdjacentPosts: JSON.stringify(adjacentPosts)
     },
     revalidate: 3600
-  }
-}
+  };
+};
 
 async function getMdxSource(postContents: string) {
   // Use remark plugins to convert markdown into HTML string
@@ -269,13 +269,13 @@ async function getMdxSource(postContents: string) {
     .use(replaceTweets)
     // Replaces examples with <Example /> component (only for demo.PRIMARY_DOMAIN)
     .use(() => replaceExamples(prisma))
-    .process(postContents)
+    .process(postContents);
 
   // Convert converted html to string format
-  const contentHtml = String(processedContent)
+  const contentHtml = String(processedContent);
 
   // Serialize the content string into MDX
-  const mdxSource = await serialize(contentHtml)
+  const mdxSource = await serialize(contentHtml);
 
-  return mdxSource
+  return mdxSource;
 }

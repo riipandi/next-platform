@@ -1,52 +1,52 @@
-import { format } from 'date-fns'
-import { useState } from 'react'
-import type { TweetData, WithClassName } from '@/types'
+import { format } from 'date-fns';
+import { useState } from 'react';
+import type { TweetData, WithClassName } from '@/types';
 
-import BlurImage from '../BlurImage'
+import BlurImage from '../BlurImage';
 
 function classNames(...classes: Array<string>) {
-  return classes.filter(Boolean).join(' ')
+  return classes.filter(Boolean).join(' ');
 }
 
 function getRemainingTime(ISOString: string) {
-  const currentTime = new Date()
-  const endTime = new Date(ISOString).getTime()
-  const diff = endTime - currentTime.getTime()
+  const currentTime = new Date();
+  const endTime = new Date(ISOString).getTime();
+  const diff = endTime - currentTime.getTime();
 
   if (diff > 36e5 * 24) {
-    const days = Math.floor(diff / (36e5 * 24))
-    const hours = Math.floor((diff - days * 36e5 * 24) / 36e5)
+    const days = Math.floor(diff / (36e5 * 24));
+    const hours = Math.floor((diff - days * 36e5 * 24) / 36e5);
 
-    return `${days} day${days > 1 ? 's' : ''} ${hours} hours`
+    return `${days} day${days > 1 ? 's' : ''} ${hours} hours`;
   }
 
-  if (diff > 36e5) return `${Math.floor(diff / 36e5)} hours`
+  if (diff > 36e5) return `${Math.floor(diff / 36e5)} hours`;
 
-  if (diff > 60e3) return `${Math.floor(diff / 60e3)} minutes`
+  if (diff > 60e3) return `${Math.floor(diff / 60e3)} minutes`;
 
-  return 'Less than a minute'
+  return 'Less than a minute';
 }
 
 interface TweetProps extends WithClassName {
-  id: string
-  metadata: string
+  id: string;
+  metadata: string;
 }
 
 export default function Tweet({ id, metadata, className }: TweetProps) {
-  const parsedMetadata = JSON.parse(metadata.replace(/\n/g, '\\n')) as TweetData
+  const parsedMetadata = JSON.parse(metadata.replace(/\n/g, '\\n')) as TweetData;
 
   const { author, created_at, media, polls, public_metrics, referenced_tweets, text, url_meta, video } =
-    parsedMetadata
+    parsedMetadata;
 
-  const authorUrl = `https://twitter.com/${author.username}`
-  const likeUrl = `https://twitter.com/intent/like?tweet_id=${id}`
-  const retweetUrl = `https://twitter.com/intent/retweet?tweet_id=${id}`
-  const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${id}`
-  const tweetUrl = `https://twitter.com/${author.username}/status/${id}`
-  const createdAt = new Date(created_at)
+  const authorUrl = `https://twitter.com/${author.username}`;
+  const likeUrl = `https://twitter.com/intent/like?tweet_id=${id}`;
+  const retweetUrl = `https://twitter.com/intent/retweet?tweet_id=${id}`;
+  const replyUrl = `https://twitter.com/intent/tweet?in_reply_to=${id}`;
+  const tweetUrl = `https://twitter.com/${author.username}/status/${id}`;
+  const createdAt = new Date(created_at);
 
   const regexToMatchURL =
-    /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/
+    /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
 
   const formattedText = text
     // Format all hyperlinks
@@ -75,13 +75,13 @@ export default function Tweet({ id, metadata, className }: TweetProps) {
           '#',
           ''
         )}" target="_blank">${match}</a>`
-    )
+    );
 
-  const quoteTweet = referenced_tweets && referenced_tweets.find((t) => t.type === 'quoted')
+  const quoteTweet = referenced_tweets && referenced_tweets.find((t) => t.type === 'quoted');
 
-  const repliedTo = referenced_tweets && referenced_tweets.find((t) => t.type === 'replied_to')
+  const repliedTo = referenced_tweets && referenced_tweets.find((t) => t.type === 'replied_to');
 
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
 
   return (
     <div
@@ -214,7 +214,7 @@ export default function Tweet({ id, metadata, className }: TweetProps) {
       {polls && (
         <div className='mt-5'>
           {polls.map((poll) => {
-            poll.total_votes = poll.options.reduce((sum, option) => sum + option.votes, 0)
+            poll.total_votes = poll.options.reduce((sum, option) => sum + option.votes, 0);
             return poll.voting_status == 'open' ? (
               <div>
                 {poll.options.map((option) => (
@@ -256,7 +256,7 @@ export default function Tweet({ id, metadata, className }: TweetProps) {
                 ))}
                 <div className='mt-4 text-base text-gray-500'>{poll.total_votes} votes · Final results</div>
               </div>
-            )
+            );
           })}
         </div>
       )}
@@ -329,9 +329,9 @@ export default function Tweet({ id, metadata, className }: TweetProps) {
         <button
           className='flex items-center mr-4 !text-gray-500 group transition !no-underline space-x-1'
           onClick={() => {
-            navigator.clipboard.writeText(tweetUrl)
-            setCopied(true)
-            setTimeout(() => setCopied(false), 5000)
+            navigator.clipboard.writeText(tweetUrl);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 5000);
           }}
         >
           <div className='group-hover:!text-green-600 rounded-full w-10 h-10 group-hover:bg-green-100 flex items-center justify-center'>
@@ -352,5 +352,5 @@ export default function Tweet({ id, metadata, className }: TweetProps) {
         </button>
       </div>
     </div>
-  )
+  );
 }

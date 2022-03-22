@@ -1,24 +1,24 @@
-import { useRouter } from 'next/router'
-import type { ChangeEvent } from 'react'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import TextareaAutosize from 'react-textarea-autosize'
-import useSWR, { mutate } from 'swr'
-import { useDebounce } from 'use-debounce'
-import type { WithSitePost } from '@/types'
-import { HttpMethod } from '@/types'
+import { useRouter } from 'next/router';
+import type { ChangeEvent } from 'react';
+import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
+import TextareaAutosize from 'react-textarea-autosize';
+import useSWR, { mutate } from 'swr';
+import { useDebounce } from 'use-debounce';
+import type { WithSitePost } from '@/types';
+import { HttpMethod } from '@/types';
 
-import { primaryDomain } from '@/libraries/config'
-import { fetcher } from '@/libraries/fetcher'
+import { primaryDomain } from '@/libraries/config';
+import { fetcher } from '@/libraries/fetcher';
 
-import Layout from '@/components/app/Layout'
-import Loader from '@/components/app/Loader'
-import LoadingDots from '@/components/app/loading-dots'
+import Layout from '@/components/app/Layout';
+import Loader from '@/components/app/Loader';
+import LoadingDots from '@/components/app/loading-dots';
 
 interface PostData {
-  title: string
-  description: string
-  content: string
+  title: string;
+  description: string;
+  content: string;
 }
 
 const CONTENT_PLACEHOLDER = `Write some content. Markdown supported:
@@ -50,13 +50,13 @@ Ordered lists look like:
 > They can span multiple paragraphs,
 > if you like.
 
-            `
+            `;
 
 export default function Post() {
-  const router = useRouter()
+  const router = useRouter();
 
   // TODO: Undefined check redirects to error
-  const { id: postId } = router.query
+  const { id: postId } = router.query;
 
   const { data: post, isValidating } = useSWR<WithSitePost>(
     router.isReady && `/api/post?postId=${postId}`,
@@ -66,7 +66,7 @@ export default function Post() {
       onError: () => router.push('/'),
       revalidateOnFocus: false
     }
-  )
+  );
 
   const [savedState, setSavedState] = useState(
     post
@@ -79,13 +79,13 @@ export default function Post() {
           minute: 'numeric'
         }).format(new Date(post.updatedAt))}`
       : 'Saving changes...'
-  )
+  );
 
   const [data, setData] = useState<PostData>({
     title: '',
     description: '',
     content: ''
-  })
+  });
 
   useEffect(() => {
     if (post)
@@ -93,40 +93,40 @@ export default function Post() {
         title: post.title ?? '',
         description: post.description ?? '',
         content: post.content ?? ''
-      })
-  }, [post])
+      });
+  }, [post]);
 
-  const [debouncedData] = useDebounce(data, 1000)
-
-  useEffect(() => {
-    if (debouncedData.title) saveChanges(debouncedData)
-  }, [debouncedData])
-
-  const [publishing, setPublishing] = useState(false)
-  const [disabled, setDisabled] = useState(true)
+  const [debouncedData] = useDebounce(data, 1000);
 
   useEffect(() => {
-    if (data.title && data.description && data.content && !publishing) setDisabled(false)
-    else setDisabled(true)
-  }, [publishing, data])
+    if (debouncedData.title) saveChanges(debouncedData);
+  }, [debouncedData]);
+
+  const [publishing, setPublishing] = useState(false);
+  const [disabled, setDisabled] = useState(true);
+
+  useEffect(() => {
+    if (data.title && data.description && data.content && !publishing) setDisabled(false);
+    else setDisabled(true);
+  }, [publishing, data]);
 
   useEffect(() => {
     function clickedSave(e: KeyboardEvent) {
-      const charCode = String.fromCharCode(e.which).toLowerCase()
+      const charCode = String.fromCharCode(e.which).toLowerCase();
 
       if ((e.ctrlKey || e.metaKey) && charCode === 's') {
-        e.preventDefault()
-        saveChanges(data)
+        e.preventDefault();
+        saveChanges(data);
       }
     }
 
-    window.addEventListener('keydown', clickedSave)
+    window.addEventListener('keydown', clickedSave);
 
-    return () => window.removeEventListener('keydown', clickedSave)
-  }, [data])
+    return () => window.removeEventListener('keydown', clickedSave);
+  }, [data]);
 
   async function saveChanges(data: PostData) {
-    setSavedState('Saving changes...')
+    setSavedState('Saving changes...');
 
     try {
       const response = await fetch('/api/post', {
@@ -140,10 +140,10 @@ export default function Post() {
           description: data.description,
           content: data.content
         })
-      })
+      });
 
       if (response.ok) {
-        const responseData = await response.json()
+        const responseData = await response.json();
         setSavedState(
           `Last save ${Intl.DateTimeFormat('en', { month: 'short' }).format(
             new Date(responseData.updatedAt)
@@ -153,18 +153,18 @@ export default function Post() {
             hour: 'numeric',
             minute: 'numeric'
           }).format(new Date(responseData.updatedAt))}`
-        )
+        );
       } else {
-        setSavedState('Failed to save.')
-        toast.error('Failed to save')
+        setSavedState('Failed to save.');
+        toast.error('Failed to save');
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
 
   async function publish() {
-    setPublishing(true)
+    setPublishing(true);
 
     try {
       const response = await fetch(`/api/post`, {
@@ -182,16 +182,16 @@ export default function Post() {
           customDomain: post?.site?.customDomain,
           slug: post?.slug
         })
-      })
+      });
 
       if (response.ok) {
-        mutate(`/api/post?postId=${postId}`)
-        router.push(`https://${post?.site?.subdomain}.${primaryDomain}/${post?.slug}`)
+        mutate(`/api/post?postId=${postId}`);
+        router.push(`https://${post?.site?.subdomain}.${primaryDomain}/${post?.slug}`);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     } finally {
-      setPublishing(false)
+      setPublishing(false);
     }
   }
 
@@ -200,7 +200,7 @@ export default function Post() {
       <Layout>
         <Loader />
       </Layout>
-    )
+    );
 
   return (
     <>
@@ -250,7 +250,7 @@ export default function Post() {
             </div>
             <button
               onClick={async () => {
-                await publish()
+                await publish();
               }}
               title={
                 disabled ? 'Post must have a title, description, and content to be published.' : 'Publish'
@@ -268,5 +268,5 @@ export default function Post() {
         </footer>
       </Layout>
     </>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-import Link from 'next/link'
-import type { MdxCardData } from '@/types'
+import Link from 'next/link';
+import type { MdxCardData } from '@/types';
 
-import BlurImage from '../BlurImage'
+import BlurImage from '../BlurImage';
 
 interface CardProps {
-  data: MdxCardData
+  data: MdxCardData;
 }
 
 export default function Card({ data }: CardProps) {
@@ -47,5 +47,5 @@ export default function Card({ data }: CardProps) {
         </div>
       </a>
     </Link>
-  )
+  );
 }

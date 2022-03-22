@@ -1,4 +1,4 @@
-import { HttpMethod } from "@/types";
+import { HttpMethod } from '@/types';
 
 export async function revalidate(domain?: string | null, slug?: string) {
   const urlPaths = [`/${slug}`, `/`];
@@ -9,11 +9,11 @@ export async function revalidate(domain?: string | null, slug?: string) {
         fetch(`${domain}/api/revalidate`, {
           method: HttpMethod.POST,
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            urlPath,
-          }),
+            urlPath
+          })
         })
       )
     );

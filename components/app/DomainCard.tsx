@@ -1,21 +1,21 @@
-import type { Site } from '@prisma/client'
-import { useState } from 'react'
-import useSWR, { mutate } from 'swr'
-import { HttpMethod } from '@/types'
+import type { Site } from '@prisma/client';
+import { useState } from 'react';
+import useSWR, { mutate } from 'swr';
+import { HttpMethod } from '@/types';
 
-import { primaryDomain } from '@/libraries/config'
-import { fetcher } from '@/libraries/fetcher'
+import { primaryDomain } from '@/libraries/config';
+import { fetcher } from '@/libraries/fetcher';
 
-import LoadingDots from '@/components/app/loading-dots'
+import LoadingDots from '@/components/app/loading-dots';
 
 type DomainData = Pick<
   Site,
   'customDomain' | 'description' | 'id' | 'image' | 'imageBlurhash' | 'name' | 'subdomain'
->
+>;
 
 interface DomainCardProps<T = DomainData> {
-  data: T
-  setData: (data: T) => void
+  data: T;
+  setData: (data: T) => void;
 }
 
 export default function DomainCard({ data, setData }: DomainCardProps) {
@@ -23,9 +23,9 @@ export default function DomainCard({ data, setData }: DomainCardProps) {
     `/api/domain/check?domain=${data.customDomain}`,
     fetcher,
     { revalidateOnMount: true, refreshInterval: 5000 }
-  )
-  const [recordType, setRecordType] = useState('CNAME')
-  const [removing, setRemoving] = useState(false)
+  );
+  const [recordType, setRecordType] = useState('CNAME');
+  const [removing, setRemoving] = useState(false);
 
   return (
     <div className='w-full max-w-2xl py-10 mt-10 border border-black rounded-lg'>
@@ -58,7 +58,7 @@ export default function DomainCard({ data, setData }: DomainCardProps) {
         <div className='flex space-x-3'>
           <button
             onClick={() => {
-              mutate(`/api/domain/check?domain=${data.customDomain}`)
+              mutate(`/api/domain/check?domain=${data.customDomain}`);
             }}
             disabled={isValidating}
             className={`${
@@ -69,17 +69,17 @@ export default function DomainCard({ data, setData }: DomainCardProps) {
           </button>
           <button
             onClick={async () => {
-              setRemoving(true)
+              setRemoving(true);
               await fetch(`/api/domain?domain=${data.customDomain}&siteId=${data.id}`, {
                 method: HttpMethod.DELETE
               }).then((res) => {
-                setRemoving(false)
+                setRemoving(false);
                 if (res.ok) {
-                  setData({ ...data, customDomain: null })
+                  setData({ ...data, customDomain: null });
                 } else {
-                  alert('Error removing domain')
+                  alert('Error removing domain');
                 }
-              })
+              });
             }}
             disabled={removing}
             className={`${
@@ -164,5 +164,5 @@ export default function DomainCard({ data, setData }: DomainCardProps) {
         </>
       )}
     </div>
-  )
+  );
 }

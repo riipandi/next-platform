@@ -1,44 +1,44 @@
-import type { Site } from '@prisma/client'
-import { useRouter } from 'next/router'
-import type { FormEvent } from 'react'
-import { useEffect, useState } from 'react'
-import toast, { Toaster } from 'react-hot-toast'
-import useSWR, { mutate } from 'swr'
-import { useDebounce } from 'use-debounce'
-import { HttpMethod } from '@/types'
+import type { Site } from '@prisma/client';
+import { useRouter } from 'next/router';
+import type { FormEvent } from 'react';
+import { useEffect, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import useSWR, { mutate } from 'swr';
+import { useDebounce } from 'use-debounce';
+import { HttpMethod } from '@/types';
 
-import { primaryDomain } from '@/libraries/config'
-import { fetcher } from '@/libraries/fetcher'
-import saveImage from '@/libraries/save-image'
+import { primaryDomain } from '@/libraries/config';
+import { fetcher } from '@/libraries/fetcher';
+import saveImage from '@/libraries/save-image';
 
-import DomainCard from '@/components/app/DomainCard'
-import Layout from '@/components/app/Layout'
-import LoadingDots from '@/components/app/loading-dots'
-import BlurImage from '@/components/BlurImage'
-import CloudinaryUploadWidget from '@/components/Cloudinary'
-import Modal from '@/components/Modal'
+import DomainCard from '@/components/app/DomainCard';
+import Layout from '@/components/app/Layout';
+import LoadingDots from '@/components/app/loading-dots';
+import BlurImage from '@/components/BlurImage';
+import CloudinaryUploadWidget from '@/components/Cloudinary';
+import Modal from '@/components/Modal';
 
 type SettingsData = Pick<
   Site,
   'id' | 'name' | 'description' | 'subdomain' | 'customDomain' | 'image' | 'imageBlurhash'
->
+>;
 
 export default function SiteSettings() {
-  const router = useRouter()
-  const { id } = router.query
-  const siteId = id
+  const router = useRouter();
+  const { id } = router.query;
+  const siteId = id;
 
   const { data: settings } = useSWR<Site | null>(siteId && `/api/site?siteId=${siteId}`, fetcher, {
     onError: () => router.push('/'),
     revalidateOnFocus: false
-  })
+  });
 
-  const [saving, setSaving] = useState(false)
-  const [adding, setAdding] = useState(false)
-  const [error, setError] = useState<any | null>(null)
-  const [disabled, setDisabled] = useState(true)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [deletingSite, setDeletingSite] = useState(false)
+  const [saving, setSaving] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [error, setError] = useState<any | null>(null);
+  const [disabled, setDisabled] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingSite, setDeletingSite] = useState(false);
 
   const [data, setData] = useState<SettingsData>({
     id: '',
@@ -48,7 +48,7 @@ export default function SiteSettings() {
     customDomain: null,
     image: null,
     imageBlurhash: null
-  })
+  });
 
   useEffect(() => {
     if (settings)
@@ -60,15 +60,15 @@ export default function SiteSettings() {
         customDomain: settings.customDomain,
         image: settings.image,
         imageBlurhash: settings.imageBlurhash
-      })
-  }, [settings])
+      });
+  }, [settings]);
 
   useEffect(() => {
-    if (adding) setDisabled(true)
-  }, [adding])
+    if (adding) setDisabled(true);
+  }, [adding]);
 
   async function saveSiteSettings(data: SettingsData) {
-    setSaving(true)
+    setSaving(true);
 
     try {
       const response = await fetch('/api/site', {
@@ -81,84 +81,84 @@ export default function SiteSettings() {
           ...data,
           id: siteId
         })
-      })
+      });
 
       if (response.ok) {
-        setSaving(false)
-        mutate(`/api/get-site-settings?siteId=${siteId}`)
-        toast.success(`Changes Saved`)
+        setSaving(false);
+        mutate(`/api/get-site-settings?siteId=${siteId}`);
+        toast.success(`Changes Saved`);
       }
     } catch (error) {
-      toast.error('Failed to save settings')
-      console.error(error)
+      toast.error('Failed to save settings');
+      console.error(error);
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
   }
 
   async function deleteSite(siteId: string) {
-    setDeletingSite(true)
+    setDeletingSite(true);
 
     try {
       const response = await fetch(`/api/site?siteId=${siteId}`, {
         method: HttpMethod.DELETE
-      })
+      });
 
-      if (response.ok) router.push('/')
+      if (response.ok) router.push('/');
     } catch (error) {
-      console.error(error)
+      console.error(error);
     } finally {
-      setDeletingSite(false)
+      setDeletingSite(false);
     }
   }
-  const [debouncedSubdomain] = useDebounce(data?.subdomain, 1500)
-  const [subdomainError, setSubdomainError] = useState<string | null>(null)
+  const [debouncedSubdomain] = useDebounce(data?.subdomain, 1500);
+  const [subdomainError, setSubdomainError] = useState<string | null>(null);
 
   useEffect(() => {
     async function checkSubdomain() {
       try {
-        const response = await fetch(`/api/domain/check?domain=${debouncedSubdomain}&subdomain=1`)
+        const response = await fetch(`/api/domain/check?domain=${debouncedSubdomain}&subdomain=1`);
 
-        const available = await response.json()
+        const available = await response.json();
 
-        setSubdomainError(available ? null : `${debouncedSubdomain}.${primaryDomain}`)
+        setSubdomainError(available ? null : `${debouncedSubdomain}.${primaryDomain}`);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
     }
 
     if (debouncedSubdomain !== settings?.subdomain && debouncedSubdomain && debouncedSubdomain?.length > 0)
-      checkSubdomain()
-  }, [debouncedSubdomain])
+      checkSubdomain();
+  }, [debouncedSubdomain]);
 
   async function handleCustomDomain(event: FormEvent<HTMLFormElement>) {
-    const customDomain = event.currentTarget.customDomain.value
+    const customDomain = event.currentTarget.customDomain.value;
 
-    setAdding(true)
+    setAdding(true);
 
     try {
       const response = await fetch(`/api/domain?domain=${customDomain}&siteId=${siteId}`, {
         method: HttpMethod.POST
-      })
+      });
 
       if (!response.ok)
         throw {
           code: response.status,
           domain: customDomain
-        }
+        };
 
-      setError(null)
+      setError(null);
 
       setData((data) => ({
         ...data,
         customDomain: customDomain
-      }))
+      }));
 
-      event.currentTarget.customDomain.value = ''
+      event.currentTarget.customDomain.value = '';
     } catch (error) {
-      setError(error)
+      setError(error);
     } finally {
-      setAdding(false)
+      setAdding(false);
     }
   }
 
@@ -235,8 +235,8 @@ export default function SiteSettings() {
             {!data.customDomain && (
               <form
                 onSubmit={async (e) => {
-                  e.preventDefault()
-                  await handleCustomDomain(e.currentTarget.customDomain.value)
+                  e.preventDefault();
+                  await handleCustomDomain(e.currentTarget.customDomain.value);
                 }}
                 className='flex items-center justify-start max-w-lg space-x-3'
               >
@@ -246,8 +246,8 @@ export default function SiteSettings() {
                     className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none font-cal focus:outline-none focus:ring-0'
                     name='customDomain'
                     onInput={(e) => {
-                      const customDomain = e.currentTarget.value
-                      setDisabled(!customDomain || customDomain.length == 0 ? true : false)
+                      const customDomain = e.currentTarget.value;
+                      setDisabled(!customDomain || customDomain.length == 0 ? true : false);
                     }}
                     pattern='^(?:[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.)?[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$'
                     placeholder='mydomain.com'
@@ -291,16 +291,16 @@ export default function SiteSettings() {
                     <button
                       className='ml-1'
                       onClick={async (e) => {
-                        e.preventDefault()
+                        e.preventDefault();
                         await fetch(`/api/request-delegation?domain=${error.domain}`).then((res) => {
                           if (res.ok) {
                             toast.success(
                               `Requested delegation for ${error.domain}. Try adding the domain again in a few minutes.`
-                            )
+                            );
                           } else {
-                            alert('There was an error requesting delegation. Please try again later.')
+                            alert('There was an error requesting delegation. Please try again later.');
                           }
-                        })
+                        });
                       }}
                     >
                       <u>Click here to request access.</u>
@@ -359,7 +359,7 @@ export default function SiteSettings() {
               </p>
               <button
                 onClick={() => {
-                  setShowDeleteModal(true)
+                  setShowDeleteModal(true);
                 }}
                 className='px-5 py-3 text-white transition-all duration-150 ease-in-out bg-red-500 border border-red-500 border-solid rounded-md hover:text-red-500 hover:bg-white max-w-max font-cal focus:outline-none'
               >
@@ -372,8 +372,8 @@ export default function SiteSettings() {
       <Modal showModal={showDeleteModal} setShowModal={setShowDeleteModal}>
         <form
           onSubmit={async (event) => {
-            event.preventDefault()
-            await deleteSite(siteId as string)
+            event.preventDefault();
+            await deleteSite(siteId as string);
           }}
           className='inline-block w-full max-w-md pt-8 overflow-hidden text-center align-middle transition-all bg-white rounded-lg shadow-xl'
         >
@@ -421,7 +421,7 @@ export default function SiteSettings() {
         <div className='flex items-center justify-end h-full max-w-screen-xl px-10 mx-auto sm:px-20'>
           <button
             onClick={() => {
-              saveSiteSettings(data)
+              saveSiteSettings(data);
             }}
             disabled={saving || subdomainError !== null}
             className={`${
@@ -435,5 +435,5 @@ export default function SiteSettings() {
         </div>
       </footer>
     </Layout>
-  )
+  );
 }

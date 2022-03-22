@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth'
+import NextAuth from 'next-auth';
 
 declare module 'next-auth' {
   interface Session {
@@ -6,56 +6,56 @@ declare module 'next-auth' {
       /**
        * The user's email address
        */
-      email?: string | null
+      email?: string | null;
 
       /**
        * The user's unique id number
        */
-      id?: string | null
+      id?: string | null;
 
       /**
        * The users preferred avatar.
        * Usually provided by the user's OAuth provider of choice
        */
-      image?: string | null
+      image?: string | null;
 
       /**
        * The user's full name
        */
-      name?: string | null
+      name?: string | null;
 
       /**
        * The user's custom & public username viewable to others
        */
-      username?: string | null
-    }
+      username?: string | null;
+    };
   }
 
   interface User {
     /**
      * The user's email address
      */
-    email?: string | null
+    email?: string | null;
 
     /**
      * The user's unique id number
      */
-    id: string
+    id: string;
 
     /**
      * The users preferred avatar.
      * Usually provided by the user's OAuth provider of choice
      */
-    image?: string | null
+    image?: string | null;
 
     /**
      * The user's full name
      */
-    name?: string | null
+    name?: string | null;
 
     /**
      * The user's custom & public username viewable to others
      */
-    username?: string | null
+    username?: string | null;
   }
 }

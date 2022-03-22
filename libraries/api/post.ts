@@ -1,16 +1,16 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Session } from 'next-auth'
-import type { WithSitePost } from '@/types'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { Session } from 'next-auth';
+import type { WithSitePost } from '@/types';
 
-import { primaryDomain } from '@/libraries/config'
-import prisma from '@/libraries/prisma'
-import { revalidate } from '@/libraries/revalidate'
+import { primaryDomain } from '@/libraries/config';
+import prisma from '@/libraries/prisma';
+import { revalidate } from '@/libraries/revalidate';
 
-import type { Post, Site } from '.prisma/client'
+import type { Post, Site } from '.prisma/client';
 
 interface AllPosts {
-  posts: Array<Post>
-  site: Site | null
+  posts: Array<Post>;
+  site: Site | null;
 }
 
 /**
@@ -28,12 +28,12 @@ export async function getPost(
   res: NextApiResponse,
   session: Session
 ): Promise<void | NextApiResponse<AllPosts | (WithSitePost | null)>> {
-  const { postId, siteId, published } = req.query
+  const { postId, siteId, published } = req.query;
 
   if (Array.isArray(postId) || Array.isArray(siteId) || Array.isArray(published))
-    return res.status(400).end('Bad request. Query parameters are not valid.')
+    return res.status(400).end('Bad request. Query parameters are not valid.');
 
-  if (!session.user.id) return res.status(500).end('Server failed to get session user ID')
+  if (!session.user.id) return res.status(500).end('Server failed to get session user ID');
 
   try {
     if (postId) {
@@ -49,9 +49,9 @@ export async function getPost(
         include: {
           site: true
         }
-      })
+      });
 
-      return res.status(200).json(post)
+      return res.status(200).json(post);
     }
 
     const site = await prisma.site.findFirst({
@@ -61,7 +61,7 @@ export async function getPost(
           id: session.user.id
         }
       }
-    })
+    });
 
     const posts = !site
       ? []
@@ -75,15 +75,15 @@ export async function getPost(
           orderBy: {
             createdAt: 'desc'
           }
-        })
+        });
 
     return res.status(200).json({
       posts,
       site
-    })
+    });
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }
 
@@ -101,11 +101,11 @@ export async function createPost(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse<{
-  postId: string
+  postId: string;
 }>> {
-  const { siteId } = req.query
+  const { siteId } = req.query;
 
-  if (Array.isArray(siteId)) return res.status(400).end('Bad request. siteId parameter cannot be an array.')
+  if (Array.isArray(siteId)) return res.status(400).end('Bad request. siteId parameter cannot be an array.');
 
   try {
     const response = await prisma.post.create({
@@ -119,14 +119,14 @@ export async function createPost(
           }
         }
       }
-    })
+    });
 
     return res.status(201).json({
       postId: response.id
-    })
+    });
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }
 
@@ -140,9 +140,9 @@ export async function createPost(
  * @param res - Next.js API Response
  */
 export async function deletePost(req: NextApiRequest, res: NextApiResponse): Promise<void | NextApiResponse> {
-  const { postId } = req.query
+  const { postId } = req.query;
 
-  if (Array.isArray(postId)) return res.status(400).end('Bad request. postId parameter cannot be an array.')
+  if (Array.isArray(postId)) return res.status(400).end('Bad request. postId parameter cannot be an array.');
 
   try {
     const response = await prisma.post.delete({
@@ -154,16 +154,17 @@ export async function deletePost(req: NextApiRequest, res: NextApiResponse): Pro
           select: { subdomain: true, customDomain: true }
         }
       }
-    })
+    });
     if (response) {
-      await revalidate(`https://${response.site?.subdomain}.${primaryDomain}`, response.slug) // revalidate for subdomain
+      await revalidate(`https://${response.site?.subdomain}.${primaryDomain}`, response.slug); // revalidate for subdomain
     }
-    if (response?.site?.customDomain) await revalidate(`https://${response.site.customDomain}`, response.slug) // revalidate for custom domain
+    if (response?.site?.customDomain)
+      await revalidate(`https://${response.site.customDomain}`, response.slug); // revalidate for custom domain
 
-    return res.status(200).end()
+    return res.status(200).end();
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }
 
@@ -189,7 +190,7 @@ export async function updatePost(
   res: NextApiResponse
 ): Promise<void | NextApiResponse<Post>> {
   const { id, title, description, content, slug, image, imageBlurhash, published, subdomain, customDomain } =
-    req.body
+    req.body;
 
   try {
     const post = await prisma.post.update({
@@ -205,13 +206,13 @@ export async function updatePost(
         imageBlurhash,
         published
       }
-    })
-    if (subdomain) await revalidate(`https://${subdomain}.${primaryDomain}`, slug) // revalidate for subdomain
-    if (customDomain) await revalidate(`https://${customDomain}`, slug) // revalidate for custom domain
+    });
+    if (subdomain) await revalidate(`https://${subdomain}.${primaryDomain}`, slug); // revalidate for subdomain
+    if (customDomain) await revalidate(`https://${customDomain}`, slug); // revalidate for custom domain
 
-    return res.status(200).json(post)
+    return res.status(200).json(post);
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }

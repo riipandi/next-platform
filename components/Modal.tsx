@@ -1,10 +1,10 @@
-import { Dialog, Transition } from '@headlessui/react'
-import { Fragment } from 'react'
-import type { WithChildren } from '@/types'
+import { Dialog, Transition } from '@headlessui/react';
+import { Fragment } from 'react';
+import type { WithChildren } from '@/types';
 
 interface ModalProps extends WithChildren {
-  showModal: boolean
-  setShowModal: (state: boolean) => void
+  showModal: boolean;
+  setShowModal: (state: boolean) => void;
 }
 
 export default function Modal({ children, showModal, setShowModal }: ModalProps) {
@@ -43,5 +43,5 @@ export default function Modal({ children, showModal, setShowModal }: ModalProps)
         </Dialog>
       </Transition>
     </>
-  )
+  );
 }

@@ -1,43 +1,45 @@
-import { useSession } from 'next-auth/react'
-import { useEffect, useRef, useState } from 'react'
-import toast, { Toaster } from 'react-hot-toast'
-import type { UserSettings } from '@/types'
-import { HttpMethod } from '@/types'
+import { useSession } from 'next-auth/react';
+import { useEffect, useRef, useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+import type { UserSettings } from '@/types';
+import { HttpMethod } from '@/types';
 
-import saveImage from '@/libraries/save-image'
+import saveImage from '@/libraries/save-image';
 
-import Layout from '@/components/app/Layout'
-import LoadingDots from '@/components/app/loading-dots'
-import BlurImage from '@/components/BlurImage'
-import CloudinaryUploadWidget from '@/components/Cloudinary'
+import Layout from '@/components/app/Layout';
+import LoadingDots from '@/components/app/loading-dots';
+import BlurImage from '@/components/BlurImage';
+import CloudinaryUploadWidget from '@/components/Cloudinary';
 
 export default function AppSettings() {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
 
-  const [saving, setSaving] = useState<boolean>(false)
-  const [data, setData] = useState<UserSettings | null>(null)
+  const [saving, setSaving] = useState<boolean>(false);
+  const [data, setData] = useState<UserSettings | null>(null);
 
-  const nameRef = useRef<HTMLInputElement | null>(null)
-  const emailRef = useRef<HTMLInputElement | null>(null)
+  console.log(session);
+
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (session)
       setData({
         ...session.user
-      })
-  }, [session])
+      });
+  }, [session]);
 
   async function saveSettings(data: UserSettings | null) {
-    setSaving(true)
+    setSaving(true);
     const response = await fetch('/api/save-settings', {
       method: HttpMethod.POST,
       body: JSON.stringify({
         ...data
       })
-    })
+    });
     if (response.ok) {
-      setSaving(false)
-      toast.success(`Changes Saved`)
+      setSaving(false);
+      toast.success(`Changes Saved`);
     }
   }
 
@@ -129,7 +131,7 @@ export default function AppSettings() {
           <div className='flex items-center justify-end h-full max-w-screen-xl px-10 mx-auto sm:px-20'>
             <button
               onClick={() => {
-                saveSettings(data)
+                saveSettings(data);
               }}
               disabled={saving}
               className={`${
@@ -144,5 +146,5 @@ export default function AppSettings() {
         </footer>
       </Layout>
     </>
-  )
+  );
 }

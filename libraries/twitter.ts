@@ -2,10 +2,10 @@
 /* eslint-disable no-inner-declarations */
 // @ts-nocheck
 
-import { stringify as queryStringify } from 'querystring'
-import type { Tweet, TweetData } from '@/types'
+import { stringify as queryStringify } from 'querystring';
+import type { Tweet, TweetData } from '@/types';
 
-import { getTwitterMedia } from './twitter-media'
+import { getTwitterMedia } from './twitter-media';
 
 const queryParams = queryStringify({
   expansions:
@@ -15,7 +15,7 @@ const queryParams = queryStringify({
   'user.fields': 'id,name,profile_image_url,protected,url,username,verified',
   'media.fields': 'duration_ms,height,media_key,preview_image_url,type,url,width,public_metrics',
   'poll.fields': 'duration_minutes,end_datetime,id,options,voting_status'
-})
+});
 
 export const getTweets = async (id: string) => {
   try {
@@ -23,59 +23,59 @@ export const getTweets = async (id: string) => {
       headers: {
         Authorization: `Bearer ${process.env.TWITTER_AUTH_TOKEN}`
       }
-    })
-    const tweet = (await response.json()) as Tweet
+    });
+    const tweet = (await response.json()) as Tweet;
 
-    const getAuthorInfo = (author_id: string) => tweet.includes.users.find((user) => user.id === author_id)
+    const getAuthorInfo = (author_id: string) => tweet.includes.users.find((user) => user.id === author_id);
 
     const getReferencedTweets = (mainTweet: TweetData) =>
       mainTweet?.referenced_tweets?.map((referencedTweet) => {
-        const fullReferencedTweet = tweet.includes.tweets?.find((tweet) => tweet.id === referencedTweet.id)
+        const fullReferencedTweet = tweet.includes.tweets?.find((tweet) => tweet.id === referencedTweet.id);
         if (!fullReferencedTweet)
-          throw new Error(`Failed to find full tweet from referenced tweet ID: ${referencedTweet.id}`)
+          throw new Error(`Failed to find full tweet from referenced tweet ID: ${referencedTweet.id}`);
 
         return {
           type: referencedTweet.type,
           ...fullReferencedTweet
-        }
-      }) || []
+        };
+      }) || [];
 
     // Function to distinguish between external URLs and external t.co links and internal t.co links
     // (e.g. images, videos, gifs, quote tweets) and remove/replace them accordingly
     function getExternalUrls(tweet: TweetData) {
-      const externalURLs = tweet?.entities?.urls
+      const externalURLs = tweet?.entities?.urls;
 
       const mappings: {
-        [I in string]: string
-      } = {}
+        [I in string]: string;
+      } = {};
 
       if (externalURLs)
         externalURLs.map((url) => {
           mappings[url.url] =
             !url.display_url.startsWith('pic.twitter.com') && !url.display_url.startsWith('twitter.com')
               ? url.expanded_url
-              : ''
-        })
+              : '';
+        });
 
-      let processedText = tweet?.text
+      let processedText = tweet?.text;
       Object.entries(mappings).map(([key, value]) => {
-        processedText = processedText.replace(key, value)
-      })
+        processedText = processedText.replace(key, value);
+      });
 
-      return processedText
+      return processedText;
     }
 
-    if (tweet.data) tweet.data.text = getExternalUrls(tweet?.data) // removing/replacing t.co links for main tweet
+    if (tweet.data) tweet.data.text = getExternalUrls(tweet?.data); // removing/replacing t.co links for main tweet
     tweet?.includes?.tweets?.map((twt) => {
       // removing/replacing t.co links for referenced tweets
-      twt.text = getExternalUrls(twt)
-    })
+      twt.text = getExternalUrls(twt);
+    });
 
     const media = tweet.data?.attachments?.media_keys?.map((key) =>
       tweet.includes.media?.find((media) => media.media_key === key)
-    )
+    );
 
-    const referenced_tweets = getReferencedTweets(tweet.data)
+    const referenced_tweets = getReferencedTweets(tweet.data);
 
     return {
       ...tweet.data,
@@ -91,8 +91,8 @@ export const getTweets = async (id: string) => {
         media && media[0] && (media[0].type === 'video' || media[0].type === 'animated_gif')
           ? await getTwitterMedia(id)
           : null
-    }
+    };
   } catch (error) {
-    throw new Error(`Failed to get tweet data for tweet ID: ${id}`)
+    throw new Error(`Failed to get tweet data for tweet ID: ${id}`);
   }
-}
+};

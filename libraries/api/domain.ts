@@ -1,7 +1,7 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { HttpMethod } from '@/types'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { HttpMethod } from '@/types';
 
-import prisma from '@/libraries/prisma'
+import prisma from '@/libraries/prisma';
 
 /**
  * Add Domain
@@ -16,10 +16,10 @@ export async function createDomain(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse> {
-  const { domain, siteId } = req.query
+  const { domain, siteId } = req.query;
 
   if (Array.isArray(domain) || Array.isArray(siteId))
-    return res.status(400).end('Bad request. Query parameters are not valid.')
+    return res.status(400).end('Bad request. Query parameters are not valid.');
 
   try {
     const response = await fetch(
@@ -32,15 +32,15 @@ export async function createDomain(
         },
         method: HttpMethod.POST
       }
-    )
+    );
 
-    const data = await response.json()
+    const data = await response.json();
 
     // Domain is already owned by another team but you can request delegation to access it
-    if (data.error?.code === 'forbidden') return res.status(403).end()
+    if (data.error?.code === 'forbidden') return res.status(403).end();
 
     // Domain is already being used by a different project
-    if (data.error?.code === 'domain_taken') return res.status(409).end()
+    if (data.error?.code === 'domain_taken') return res.status(409).end();
 
     // Domain is successfully added
     await prisma.site.update({
@@ -50,12 +50,12 @@ export async function createDomain(
       data: {
         customDomain: domain
       }
-    })
+    });
 
-    return res.status(200).end()
+    return res.status(200).end();
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }
 
@@ -72,10 +72,10 @@ export async function deleteDomain(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse> {
-  const { domain, siteId } = req.query
+  const { domain, siteId } = req.query;
 
   if (Array.isArray(domain) || Array.isArray(siteId))
-    res.status(400).end('Bad request. Query parameters cannot be an array.')
+    res.status(400).end('Bad request. Query parameters cannot be an array.');
 
   try {
     const response = await fetch(
@@ -86,9 +86,9 @@ export async function deleteDomain(
         },
         method: HttpMethod.DELETE
       }
-    )
+    );
 
-    await response.json()
+    await response.json();
 
     await prisma.site.update({
       where: {
@@ -97,11 +97,11 @@ export async function deleteDomain(
       data: {
         customDomain: null
       }
-    })
+    });
 
-    return res.status(200).end()
+    return res.status(200).end();
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }

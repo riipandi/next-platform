@@ -1,32 +1,32 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { signOut } from 'next-auth/react'
-import React from 'react'
-import type { WithChildren } from '@/types'
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { signOut } from 'next-auth/react';
+import React from 'react';
+import type { WithChildren } from '@/types';
 
-import useRequireAuth from '@/libraries/useRequireAuth'
+import useRequireAuth from '@/libraries/useRequireAuth';
 
-import Loader from './Loader'
+import Loader from './Loader';
 
 interface LayoutProps extends WithChildren {
-  siteId?: string
+  siteId?: string;
 }
 
 export default function Layout({ siteId, children }: LayoutProps) {
-  const title = 'Platforms on Vercel'
+  const title = 'Platforms on Vercel';
   const description =
-    'Create a fullstack application with multi-tenancy and custom domains support using Next.js, Prisma, and PostgreSQL'
-  const logo = '/favicon.ico'
-  const router = useRouter()
-  const sitePage = router.pathname.startsWith('/app/site/[id]')
-  const postPage = router.pathname.startsWith('/app/post/[id]')
-  const rootPage = !sitePage && !postPage
-  const tab = rootPage ? router.asPath.split('/')[1] : router.asPath.split('/')[3]
+    'Create a fullstack application with multi-tenancy and custom domains support using Next.js, Prisma, and PostgreSQL';
+  const logo = '/favicon.ico';
+  const router = useRouter();
+  const sitePage = router.pathname.startsWith('/app/site/[id]');
+  const postPage = router.pathname.startsWith('/app/post/[id]');
+  const rootPage = !sitePage && !postPage;
+  const tab = rootPage ? router.asPath.split('/')[1] : router.asPath.split('/')[3];
 
-  const session = useRequireAuth()
-  if (!session) return <Loader />
+  const session = useRequireAuth();
+  if (!session) return <Loader />;
 
   return (
     <>
@@ -182,5 +182,5 @@ export default function Layout({ siteId, children }: LayoutProps) {
         <div className='pt-28'>{children}</div>
       </div>
     </>
-  )
+  );
 }

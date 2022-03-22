@@ -1,31 +1,31 @@
-import type { Post, Site } from '@prisma/client'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import useSWR from 'swr'
-import { HttpMethod } from '@/types'
+import type { Post, Site } from '@prisma/client';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import useSWR from 'swr';
+import { HttpMethod } from '@/types';
 
-import { primaryDomain } from '@/libraries/config'
-import { fetcher } from '@/libraries/fetcher'
+import { primaryDomain } from '@/libraries/config';
+import { fetcher } from '@/libraries/fetcher';
 
-import Layout from '@/components/app/Layout'
-import LoadingDots from '@/components/app/loading-dots'
-import BlurImage from '@/components/BlurImage'
+import Layout from '@/components/app/Layout';
+import LoadingDots from '@/components/app/loading-dots';
+import BlurImage from '@/components/BlurImage';
 
 interface SitePostData {
-  posts: Array<Post>
-  site: Site | null
+  posts: Array<Post>;
+  site: Site | null;
 }
 
 export default function SiteDrafts() {
-  const [creatingPost, setCreatingPost] = useState(false)
+  const [creatingPost, setCreatingPost] = useState(false);
 
-  const router = useRouter()
-  const { id: siteId } = router.query
+  const router = useRouter();
+  const { id: siteId } = router.query;
 
   const { data } = useSWR<SitePostData>(siteId && `/api/post?siteId=${siteId}&published=false`, fetcher, {
     onSuccess: (data) => !data?.site && router.push('/')
-  })
+  });
 
   async function createPost(siteId: string) {
     try {
@@ -34,14 +34,14 @@ export default function SiteDrafts() {
         headers: {
           'Content-Type': 'application/json'
         }
-      })
+      });
 
       if (res.ok) {
-        const data = await res.json()
-        router.push(`/post/${data.postId}`)
+        const data = await res.json();
+        router.push(`/post/${data.postId}`);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
     }
   }
 
@@ -52,8 +52,8 @@ export default function SiteDrafts() {
           <h1 className='text-5xl font-cal'> Drafts for {data ? data?.site?.name : '...'}</h1>
           <button
             onClick={() => {
-              setCreatingPost(true)
-              createPost(siteId as string)
+              setCreatingPost(true);
+              createPost(siteId as string);
             }}
             className={`${
               creatingPost
@@ -146,5 +146,5 @@ export default function SiteDrafts() {
         </div>
       </div>
     </Layout>
-  )
+  );
 }

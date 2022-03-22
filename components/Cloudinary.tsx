@@ -1,14 +1,14 @@
-import Head from 'next/head'
-import type { MouseEvent, ReactNode } from 'react'
-import type { CloudinaryCallbackImage, CloudinaryWidget, CloudinaryWidgetResult } from '@/types'
+import Head from 'next/head';
+import type { MouseEvent, ReactNode } from 'react';
+import type { CloudinaryCallbackImage, CloudinaryWidget, CloudinaryWidgetResult } from '@/types';
 
 interface ChildrenProps {
-  open: (e: MouseEvent) => void
+  open: (e: MouseEvent) => void;
 }
 
 interface CloudinaryUploadWidgetProps {
-  callback: (image: CloudinaryCallbackImage) => void
-  children: (props: ChildrenProps) => ReactNode
+  callback: (image: CloudinaryCallbackImage) => void;
+  children: (props: ChildrenProps) => ReactNode;
 }
 
 export default function CloudinaryUploadWidget({ callback, children }: CloudinaryUploadWidgetProps) {
@@ -21,17 +21,17 @@ export default function CloudinaryUploadWidget({ callback, children }: Cloudinar
       },
       (error: unknown | undefined, result: CloudinaryWidgetResult) => {
         if (!error && result && result.event === 'success') {
-          callback(result.info)
+          callback(result.info);
         }
       }
-    )
+    );
 
-    widget.open()
+    widget.open();
   }
 
   function open(e: MouseEvent) {
-    e.preventDefault()
-    showWidget()
+    e.preventDefault();
+    showWidget();
   }
 
   return (
@@ -44,5 +44,5 @@ export default function CloudinaryUploadWidget({ callback, children }: Cloudinar
       </Head>
       {children({ open })}
     </>
-  )
+  );
 }

@@ -1,10 +1,10 @@
-import cuid from 'cuid'
-import type { NextApiRequest, NextApiResponse } from 'next'
-import type { Session } from 'next-auth'
+import cuid from 'cuid';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import type { Session } from 'next-auth';
 
-import prisma from '@/libraries/prisma'
+import prisma from '@/libraries/prisma';
 
-import type { Site } from '.prisma/client'
+import type { Site } from '.prisma/client';
 
 /**
  * Get Site
@@ -22,11 +22,11 @@ export async function getSite(
   res: NextApiResponse,
   session: Session
 ): Promise<void | NextApiResponse<Array<Site> | (Site | null)>> {
-  const { siteId } = req.query
+  const { siteId } = req.query;
 
-  if (Array.isArray(siteId)) return res.status(400).end('Bad request. siteId parameter cannot be an array.')
+  if (Array.isArray(siteId)) return res.status(400).end('Bad request. siteId parameter cannot be an array.');
 
-  if (!session.user.id) return res.status(500).end('Server failed to get session user ID')
+  if (!session.user.id) return res.status(500).end('Server failed to get session user ID');
 
   try {
     if (siteId) {
@@ -37,9 +37,9 @@ export async function getSite(
             id: session.user.id
           }
         }
-      })
+      });
 
-      return res.status(200).json(settings)
+      return res.status(200).json(settings);
     }
 
     const sites = await prisma.site.findMany({
@@ -48,12 +48,12 @@ export async function getSite(
           id: session.user.id
         }
       }
-    })
+    });
 
-    return res.status(200).json(sites)
+    return res.status(200).json(sites);
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }
 
@@ -76,11 +76,11 @@ export async function createSite(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse<{
-  siteId: string
+  siteId: string;
 }>> {
-  const { name, subdomain, description, userId } = req.body
+  const { name, subdomain, description, userId } = req.body;
 
-  const sub = subdomain.replace(/[^a-zA-Z0-9/-]+/g, '')
+  const sub = subdomain.replace(/[^a-zA-Z0-9/-]+/g, '');
 
   try {
     const response = await prisma.site.create({
@@ -98,14 +98,14 @@ export async function createSite(
           }
         }
       }
-    })
+    });
 
     return res.status(201).json({
       siteId: response.id
-    })
+    });
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }
 
@@ -119,9 +119,9 @@ export async function createSite(
  * @param res - Next.js API Response
  */
 export async function deleteSite(req: NextApiRequest, res: NextApiResponse): Promise<void | NextApiResponse> {
-  const { siteId } = req.query
+  const { siteId } = req.query;
 
-  if (Array.isArray(siteId)) return res.status(400).end('Bad request. siteId parameter cannot be an array.')
+  if (Array.isArray(siteId)) return res.status(400).end('Bad request. siteId parameter cannot be an array.');
 
   try {
     await prisma.$transaction([
@@ -137,12 +137,12 @@ export async function deleteSite(req: NextApiRequest, res: NextApiResponse): Pro
           id: siteId
         }
       })
-    ])
+    ]);
 
-    return res.status(200).end()
+    return res.status(200).end();
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }
 
@@ -165,10 +165,10 @@ export async function updateSite(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void | NextApiResponse<Site>> {
-  const { id, currentSubdomain, name, description, image, imageBlurhash } = req.body
+  const { id, currentSubdomain, name, description, image, imageBlurhash } = req.body;
 
-  const sub = req.body.subdomain.replace(/[^a-zA-Z0-9/-]+/g, '')
-  const subdomain = sub.length > 0 ? sub : currentSubdomain
+  const sub = req.body.subdomain.replace(/[^a-zA-Z0-9/-]+/g, '');
+  const subdomain = sub.length > 0 ? sub : currentSubdomain;
 
   try {
     const response = await prisma.site.update({
@@ -182,11 +182,11 @@ export async function updateSite(
         image,
         imageBlurhash
       }
-    })
+    });
 
-    return res.status(200).json(response)
+    return res.status(200).json(response);
   } catch (error) {
-    console.error(error)
-    return res.status(500).end(error)
+    console.error(error);
+    return res.status(500).end(error);
   }
 }
