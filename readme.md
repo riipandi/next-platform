@@ -14,7 +14,7 @@
 ## Introduction
 
 A starter project for Multi-tenant [Next.js](https://nextjs.org/) with [Tailwind CSS](https://tailwindcss.com)
-and [Typescript](https://www.typescriptlang.org/). Inspired from [Platforms Starter Kit by Vercel](https://github.com/vercel/platforms), 
+and [Typescript](https://www.typescriptlang.org/). Inspired from [Platforms Starter Kit by Vercel](https://github.com/riipandi/next-platform), 
 this starter kit already pre-configured with [absolute import](https://jsdev.org/env/nodejs/absolute-path-imports/),
 [TailwindUI](https://tailwindui.com), [Framer Motion](https://www.framer.com/motion/), and some [other goodies](./package.json).
 

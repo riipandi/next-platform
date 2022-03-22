@@ -86,7 +86,7 @@ export default function Layout({ siteId, children }: LayoutProps) {
               </button>
             </div>
             <a
-              href='https://github.com/vercel/platforms'
+              href='https://github.com/riipandi/next-platform'
               target='_blank'
               className='flex items-center px-5 py-3 space-x-2 text-gray-700 transition-all duration-150 ease-in-out font-cal sm:hover:text-black sm:hover:bg-white'
               rel='noreferrer'
