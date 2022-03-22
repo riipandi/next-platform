@@ -1,6 +1,9 @@
 import React from 'react'
+import type { BaseIconProps } from '@/types'
 
-function LinkIcon({ width, height, color }) {
+type LinkIconProps = BaseIconProps
+
+function LinkIcon({ className, color, height, width }: LinkIconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -8,6 +11,7 @@ function LinkIcon({ width, height, color }) {
       y='0'
       width={width}
       height={height}
+      className={className}
       fill={color}
       enableBackground='new 0 0 512 512'
       version='1.1'

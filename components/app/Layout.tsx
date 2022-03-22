@@ -4,12 +4,17 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { signOut } from 'next-auth/react'
 import React from 'react'
+import type { WithChildren } from '@/types'
 
 import useRequireAuth from '@/libraries/useRequireAuth'
 
 import Loader from './Loader'
 
-export default function Layout({ siteId, children }) {
+interface LayoutProps extends WithChildren {
+  siteId?: string
+}
+
+export default function Layout({ siteId, children }: LayoutProps) {
   const title = 'Platforms on Vercel'
   const description =
     'Create a fullstack application with multi-tenancy and custom domains support using Next.js, Prisma, and PostgreSQL'
@@ -57,10 +62,19 @@ export default function Layout({ siteId, children }) {
             <div className='flex space-x-4'>
               <Link href='/'>
                 <a className='flex items-center justify-center'>
-                  <div className='inline-block w-8 h-8 overflow-hidden align-middle rounded-full'>
-                    <Image src={session.user.image} width={40} height={40} alt={session.user.name} />
-                  </div>
-                  <span className='inline-block ml-3 font-medium truncate sm:block'>{session.user.name}</span>
+                  {session.user && session.user.image && (
+                    <div className='inline-block w-8 h-8 overflow-hidden align-middle rounded-full'>
+                      <Image
+                        src={session.user.image}
+                        width={40}
+                        height={40}
+                        alt={session.user.name ?? 'User avatar'}
+                      />
+                    </div>
+                  )}
+                  <span className='inline-block ml-3 font-medium truncate sm:block'>
+                    {session.user?.name}
+                  </span>
                 </a>
               </Link>
               <div className='h-8 border border-gray-300' />
@@ -72,10 +86,10 @@ export default function Layout({ siteId, children }) {
               </button>
             </div>
             <a
-              href='https://github.com/riipandi/next-platform'
+              href='https://github.com/vercel/platforms'
               target='_blank'
-              rel='noreferrer noopener'
               className='flex items-center px-5 py-3 space-x-2 text-gray-700 transition-all duration-150 ease-in-out font-cal sm:hover:text-black sm:hover:bg-white'
+              rel='noreferrer'
             >
               <p className='hidden sm:block'>Build my own</p>
               <svg
@@ -92,12 +106,12 @@ export default function Layout({ siteId, children }) {
         </div>
         {rootPage && (
           <div className='absolute left-0 right-0 flex items-center justify-center space-x-16 bg-white border-b border-gray-200 top-16 font-cal'>
-            <Link href='/'>
+            <Link href='/' passHref>
               <a className={`border-b-2 ${tab == '' ? 'border-black' : 'border-transparent'} py-3`}>
                 My Sites
               </a>
             </Link>
-            <Link href='/settings'>
+            <Link href='/settings' passHref>
               <a className={`border-b-2 ${tab == 'settings' ? 'border-black' : 'border-transparent'} py-3`}>
                 Settings
               </a>
@@ -107,21 +121,21 @@ export default function Layout({ siteId, children }) {
         {sitePage && (
           <div className='absolute left-0 right-0 bg-white border-b border-gray-200 top-16 font-cal'>
             <div className='flex items-center justify-between max-w-screen-xl px-10 mx-auto space-x-16 sm:px-20'>
-              <Link href={`/`}>
+              <Link href='/' passHref>
                 <a>
                   ←<p className='hidden ml-3 md:inline-block'>All Sites</p>
                 </a>
               </Link>
               <div className='flex items-center justify-between space-x-10 md:space-x-16'>
-                <Link href={`/site/${router.query.id}`}>
+                <Link href={`/site/${router.query.id}`} passHref>
                   <a className={`border-b-2 ${!tab ? 'border-black' : 'border-transparent'} py-3`}>Posts</a>
                 </Link>
-                <Link href={`/site/${router.query.id}/drafts`}>
+                <Link href={`/site/${router.query.id}/drafts`} passHref>
                   <a className={`border-b-2 ${tab == 'drafts' ? 'border-black' : 'border-transparent'} py-3`}>
                     Drafts
                   </a>
                 </Link>
-                <Link href={`/site/${router.query.id}/settings`}>
+                <Link href={`/site/${router.query.id}/settings`} passHref>
                   <a
                     className={`border-b-2 ${tab == 'settings' ? 'border-black' : 'border-transparent'} py-3`}
                   >
@@ -137,7 +151,7 @@ export default function Layout({ siteId, children }) {
           <div className='absolute left-0 right-0 bg-white border-b border-gray-200 top-16 font-cal'>
             <div className='flex items-center justify-between max-w-screen-xl px-10 mx-auto space-x-16 sm:px-20'>
               {siteId ? (
-                <Link href={`/site/${siteId}`}>
+                <Link href={`/site/${siteId}`} passHref>
                   <a>
                     ←<p className='hidden ml-3 md:inline-block'>All Posts</p>
                   </a>
@@ -150,10 +164,10 @@ export default function Layout({ siteId, children }) {
               )}
 
               <div className='flex items-center justify-between space-x-10 md:space-x-16'>
-                <Link href={`/post/${router.query.id}`}>
+                <Link href={`/post/${router.query.id}`} passHref>
                   <a className={`border-b-2 ${!tab ? 'border-black' : 'border-transparent'} py-3`}>Editor</a>
                 </Link>
-                <Link href={`/post/${router.query.id}/settings`}>
+                <Link href={`/post/${router.query.id}/settings`} passHref>
                   <a
                     className={`border-b-2 ${tab == 'settings' ? 'border-black' : 'border-transparent'} py-3`}
                   >

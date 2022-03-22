@@ -1,34 +1,44 @@
+import type { Site } from '@prisma/client'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useSWR from 'swr'
 import { useDebounce } from 'use-debounce'
+import { HttpMethod } from '@/types'
+
+import { fetcher } from '@/libraries/fetcher'
 
 import Layout from '@/components/app/Layout'
 import LoadingDots from '@/components/app/loading-dots'
 import BlurImage from '@/components/BlurImage'
 import Modal from '@/components/Modal'
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json())
-
 export default function AppIndex() {
-  const [showModal, setShowModal] = useState(false)
-  const [creatingSite, setCreatingSite] = useState(false)
-  const [subdomain, setSubdomain] = useState('')
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [creatingSite, setCreatingSite] = useState<boolean>(false)
+  const [subdomain, setSubdomain] = useState<string>('')
   const [debouncedSubdomain] = useDebounce(subdomain, 1500)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(async () => {
-    if (debouncedSubdomain.length > 0) {
-      const response = await fetch(`/api/check-subdomain?subdomain=${debouncedSubdomain}`)
-      const available = await response.json()
-      if (available) {
-        setError(null)
-      } else {
-        setError(`${debouncedSubdomain}.vercel.pub`)
+  const siteNameRef = useRef<HTMLInputElement | null>(null)
+  const siteSubdomainRef = useRef<HTMLInputElement | null>(null)
+  const siteDescriptionRef = useRef<HTMLTextAreaElement | null>(null)
+
+  useEffect(() => {
+    async function checkSubDomain() {
+      if (debouncedSubdomain.length > 0) {
+        const response = await fetch(`/api/domain/check?domain=${debouncedSubdomain}&subdomain=1`)
+        const available = await response.json()
+        if (available) {
+          setError(null)
+        } else {
+          setError(`${debouncedSubdomain}.mystream.page`)
+        }
       }
     }
+    checkSubDomain()
   }, [debouncedSubdomain])
 
   const router = useRouter()
@@ -36,19 +46,19 @@ export default function AppIndex() {
   const { data: session } = useSession()
   const sessionId = session?.user?.id
 
-  const { data: sites } = useSWR(sessionId && `/api/site`, fetcher)
+  const { data: sites } = useSWR<Array<Site>>(sessionId && `/api/site`, fetcher)
 
-  async function createSite(e) {
+  async function createSite(e: FormEvent<HTMLFormElement>) {
     const res = await fetch('/api/site', {
-      method: 'POST',
+      method: HttpMethod.POST,
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         userId: sessionId,
-        name: e.target.name.value,
-        subdomain: e.target.subdomain.value,
-        description: e.target.description.value
+        name: siteNameRef.current?.value,
+        subdomain: siteSubdomainRef.current?.value,
+        description: siteDescriptionRef.current?.value
       })
     })
     if (res.ok) {
@@ -74,22 +84,24 @@ export default function AppIndex() {
               <span className='pl-5 pr-1'>📌</span>
               <input
                 className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-r-lg focus:outline-none focus:ring-0'
-                type='text'
                 name='name'
                 placeholder='Site Name'
+                ref={siteNameRef}
+                type='text'
               />
             </div>
             <div className='flex items-center border border-gray-700 rounded-lg flex-start'>
               <span className='pl-5 pr-1'>🪧</span>
               <input
                 className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-l-lg focus:outline-none focus:ring-0'
-                type='text'
                 name='subdomain'
+                onInput={() => setSubdomain(siteSubdomainRef.current!.value)}
                 placeholder='Subdomain'
-                onInput={(e) => setSubdomain(e.target.value)}
+                ref={siteSubdomainRef}
+                type='text'
               />
               <span className='flex items-center h-full px-5 bg-gray-100 border-l border-gray-600 rounded-r-lg'>
-                .vercel.pub
+                .mystream.page
               </span>
             </div>
             {error && (
@@ -100,11 +112,12 @@ export default function AppIndex() {
             <div className='flex border border-gray-700 rounded-lg flex-start items-top'>
               <span className='pl-5 pr-1 mt-3'>✍️</span>
               <textarea
-                required
-                name='description'
-                rows='3'
                 className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-r-lg focus:outline-none focus:ring-0'
+                name='description'
                 placeholder='Description'
+                ref={siteDescriptionRef}
+                required
+                rows={3}
               />
             </div>
           </div>
@@ -122,7 +135,7 @@ export default function AppIndex() {
 
             <button
               type='submit'
-              disabled={creatingSite || error}
+              disabled={creatingSite || error !== null}
               className={`${
                 creatingSite || error
                   ? 'cursor-not-allowed text-gray-400 bg-gray-50'
@@ -153,19 +166,30 @@ export default function AppIndex() {
                   <a>
                     <div className='flex flex-col overflow-hidden border border-gray-200 rounded-lg md:flex-row md:h-60'>
                       <div className='relative w-full h-60 md:h-auto md:w-1/3 md:flex-none'>
-                        <BlurImage src={site.image} layout='fill' objectFit='cover' alt={site.name} />
+                        {site.image ? (
+                          <BlurImage
+                            src={site.image}
+                            layout='fill'
+                            objectFit='cover'
+                            alt={site.name ?? 'Site thumbnail'}
+                          />
+                        ) : (
+                          <div className='absolute flex items-center justify-center w-full h-full text-4xl text-gray-500 bg-gray-100 select-none'>
+                            ?
+                          </div>
+                        )}
                       </div>
                       <div className='relative p-10'>
                         <h2 className='text-3xl font-cal'>{site.name}</h2>
                         <p className='my-5 text-base line-clamp-3'>{site.description}</p>
                         <a
                           onClick={(e) => e.stopPropagation()}
-                          href={`https://${site.subdomain}.vercel.pub`}
+                          href={`https://${site.subdomain}.mystream.page`}
                           target='_blank'
                           className='absolute px-3 py-1 tracking-wide text-gray-600 bg-gray-200 rounded font-cal bottom-5 left-10 whitespace-nowrap'
                           rel='noreferrer'
                         >
-                          {site.subdomain}.vercel.pub ↗
+                          {site.subdomain}.mystream.page ↗
                         </a>
                       </div>
                     </div>

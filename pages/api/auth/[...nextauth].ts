@@ -1,8 +1,12 @@
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
+import type { NextAuthOptions } from 'next-auth'
 import NextAuth from 'next-auth'
 import GitHubProvider from 'next-auth/providers/github'
 
 import prisma from '@/libraries/prisma'
+
+if (!process.env.GITHUB_ID || !process.env.GITHUB_SECRET)
+  throw new Error('Failed to initialize Github authentication')
 
 export const authOptions = {
   providers: [
@@ -37,6 +41,6 @@ export const authOptions = {
       }
     })
   }
-}
+} as NextAuthOptions
 
 export default NextAuth(authOptions)

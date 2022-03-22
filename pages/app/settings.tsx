@@ -1,6 +1,8 @@
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
+import type { UserSettings } from '@/types'
+import { HttpMethod } from '@/types'
 
 import saveImage from '@/libraries/save-image'
 
@@ -12,9 +14,11 @@ import CloudinaryUploadWidget from '@/components/Cloudinary'
 export default function AppSettings() {
   const { data: session } = useSession()
 
-  const [saving, setSaving] = useState(false)
+  const [saving, setSaving] = useState<boolean>(false)
+  const [data, setData] = useState<UserSettings | null>(null)
 
-  const [data, setData] = useState(null)
+  const nameRef = useRef<HTMLInputElement | null>(null)
+  const emailRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     if (session)
@@ -23,10 +27,10 @@ export default function AppSettings() {
       })
   }, [session])
 
-  async function saveSettings(data) {
+  async function saveSettings(data: UserSettings | null) {
     setSaving(true)
     const response = await fetch('/api/save-settings', {
-      method: 'POST',
+      method: HttpMethod.POST,
       body: JSON.stringify({
         ...data
       })
@@ -46,37 +50,47 @@ export default function AppSettings() {
             duration: 10000
           }}
         />
-        <div className='max-w-screen-xl mx-auto px-10 sm:px-20 mt-10 mb-16'>
-          <h1 className='font-cal text-5xl mb-12'>Settings</h1>
-          <div className='mb-28 flex flex-col space-y-12'>
+        <div className='max-w-screen-xl px-10 mx-auto mt-10 mb-16 sm:px-20'>
+          <h1 className='mb-12 text-5xl font-cal'>Settings</h1>
+          <div className='flex flex-col space-y-12 mb-28'>
             <div className='space-y-6'>
-              <h2 className='font-cal text-2xl'>Name</h2>
-              <div className='border border-gray-700 rounded-lg flex items-center max-w-lg overflow-hidden'>
+              <h2 className='text-2xl font-cal'>Name</h2>
+              <div className='flex items-center max-w-lg overflow-hidden border border-gray-700 rounded-lg'>
                 <input
-                  className='w-full px-5 py-3 font-cal text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-lg placeholder-gray-400'
+                  className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-lg font-cal focus:outline-none focus:ring-0'
                   type='text'
                   name='name'
                   placeholder='Your awesome name'
-                  value={data?.name}
-                  onInput={(e) => setData((data) => ({ ...data, name: e.target.value }))}
+                  ref={nameRef}
+                  onInput={(e) =>
+                    setData((data) => ({
+                      ...data,
+                      name: nameRef.current?.value
+                    }))
+                  }
                 />
               </div>
             </div>
             <div className='space-y-6'>
-              <h2 className='font-cal text-2xl'>Email</h2>
-              <div className='border border-gray-700 rounded-lg flex items-center max-w-lg overflow-hidden'>
+              <h2 className='text-2xl font-cal'>Email</h2>
+              <div className='flex items-center max-w-lg overflow-hidden border border-gray-700 rounded-lg'>
                 <input
-                  className='w-full px-5 py-3 font-cal text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-lg placeholder-gray-400'
+                  className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-lg font-cal focus:outline-none focus:ring-0'
                   type='text'
                   name='email'
                   placeholder='panic@thedis.co'
-                  value={data?.email}
-                  onInput={(e) => setData((data) => ({ ...data, email: e.target.value }))}
+                  ref={emailRef}
+                  onInput={(e) =>
+                    setData((data) => ({
+                      ...data,
+                      email: emailRef.current?.value
+                    }))
+                  }
                 />
               </div>
             </div>
             <div className='space-y-6'>
-              <h2 className='font-cal text-2xl'>Display Picture</h2>
+              <h2 className='text-2xl font-cal'>Display Picture</h2>
               <div
                 className={`${
                   data?.image ? '' : 'animate-pulse bg-gray-300 h-150'
@@ -86,7 +100,7 @@ export default function AppSettings() {
                   {({ open }) => (
                     <button
                       onClick={open}
-                      className='absolute w-full h-full rounded-md bg-gray-200 z-10 flex flex-col justify-center items-center opacity-0 hover:opacity-100 transition-all ease-linear duration-200'
+                      className='absolute z-10 flex flex-col items-center justify-center w-full h-full transition-all duration-200 ease-linear bg-gray-200 rounded-md opacity-0 hover:opacity-100'
                     >
                       <svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24'>
                         <path d='M16 16h-3v5h-2v-5h-3l4-4 4 4zm3.479-5.908c-.212-3.951-3.473-7.092-7.479-7.092s-7.267 3.141-7.479 7.092c-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h3.5v-2h-3.5c-1.93 0-3.5-1.57-3.5-3.5 0-2.797 2.479-3.833 4.433-3.72-.167-4.218 2.208-6.78 5.567-6.78 3.453 0 5.891 2.797 5.567 6.78 1.745-.046 4.433.751 4.433 3.72 0 1.93-1.57 3.5-3.5 3.5h-3.5v2h3.5c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408z' />
@@ -111,8 +125,8 @@ export default function AppSettings() {
             </div>
           </div>
         </div>
-        <footer className='h-20 z-20 fixed bottom-0 inset-x-0 border-solid border-t border-gray-500 bg-white'>
-          <div className='max-w-screen-xl mx-auto px-10 sm:px-20 h-full flex justify-end items-center'>
+        <footer className='fixed inset-x-0 bottom-0 z-20 h-20 bg-white border-t border-gray-500 border-solid'>
+          <div className='flex items-center justify-end h-full max-w-screen-xl px-10 mx-auto sm:px-20'>
             <button
               onClick={() => {
                 saveSettings(data)

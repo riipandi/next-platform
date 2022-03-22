@@ -1,39 +1,46 @@
+import type { Post, Site } from '@prisma/client'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import useSWR from 'swr'
+import { HttpMethod } from '@/types'
+
+import { fetcher } from '@/libraries/fetcher'
 
 import Layout from '@/components/app/Layout'
 import LoadingDots from '@/components/app/loading-dots'
 import BlurImage from '@/components/BlurImage'
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json())
+interface SitePostData {
+  posts: Array<Post>
+  site: Site | null
+}
 
 export default function SiteDrafts() {
   const [creatingPost, setCreatingPost] = useState(false)
 
   const router = useRouter()
-  const { id } = router.query
-  const siteId = id
+  const { id: siteId } = router.query
 
-  const { data } = useSWR(siteId && `/api/post?siteId=${siteId}&published=false`, fetcher, {
-    onSuccess: (data) => {
-      if (!data?.site) {
-        router.push('/')
-      }
-    }
+  const { data } = useSWR<SitePostData>(siteId && `/api/post?siteId=${siteId}&published=false`, fetcher, {
+    onSuccess: (data) => !data?.site && router.push('/')
   })
 
-  async function createPost(siteId) {
-    const res = await fetch(`/api/post?siteId=${siteId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+  async function createPost(siteId: string) {
+    try {
+      const res = await fetch(`/api/post?siteId=${siteId}`, {
+        method: HttpMethod.POST,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        router.push(`/post/${data.postId}`)
       }
-    })
-    if (res.ok) {
-      const data = await res.json()
-      router.push(`/post/${data.postId}`)
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -45,7 +52,7 @@ export default function SiteDrafts() {
           <button
             onClick={() => {
               setCreatingPost(true)
-              createPost(siteId)
+              createPost(siteId as string)
             }}
             className={`${
               creatingPost
@@ -70,7 +77,18 @@ export default function SiteDrafts() {
                   <a>
                     <div className='flex flex-col overflow-hidden border border-gray-200 rounded-lg md:flex-row md:h-60'>
                       <div className='relative w-full h-60 md:h-auto md:w-1/3 md:flex-none'>
-                        <BlurImage src={post.image} layout='fill' objectFit='cover' alt={post.name} />
+                        {post.image ? (
+                          <BlurImage
+                            alt={post.title ?? 'Unknown Thumbnail'}
+                            layout='fill'
+                            objectFit='cover'
+                            src={post.image}
+                          />
+                        ) : (
+                          <div className='absolute flex items-center justify-center w-full h-full text-4xl text-gray-500 bg-gray-100'>
+                            ?
+                          </div>
+                        )}
                       </div>
                       <div className='relative p-10'>
                         <h2 className='text-3xl font-cal'>{post.title || 'Untitled Post'}</h2>
@@ -78,12 +96,12 @@ export default function SiteDrafts() {
                           {post.description || 'No description provided. Click to edit.'}
                         </p>
                         <a
-                          href={`https://${data.site.subdomain}.vercel.pub/${post.slug}`}
+                          href={`https://${data.site?.subdomain}.mystream.page/${post.slug}`}
                           target='_blank'
                           className='absolute px-3 py-1 tracking-wide text-gray-600 bg-gray-200 rounded font-cal bottom-5 left-10 whitespace-nowrap'
                           rel='noreferrer'
                         >
-                          {data.site.subdomain}.vercel.pub/{post.slug} ↗
+                          {data.site?.subdomain}.mystream.page/{post.slug} ↗
                         </a>
                       </div>
                     </div>

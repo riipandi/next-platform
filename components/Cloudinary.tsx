@@ -1,45 +1,48 @@
-import { Component } from 'react'
 import Head from 'next/head'
+import type { MouseEvent, ReactNode } from 'react'
+import type { CloudinaryCallbackImage, CloudinaryWidget, CloudinaryWidgetResult } from '@/types'
 
-export default class CloudinaryUploadWidget extends Component {
-  constructor(props) {
-    super(props)
-    this.uploader = null
-  }
+interface ChildrenProps {
+  open: (e: MouseEvent) => void
+}
 
-  showWidget = () => {
-    const { callback } = this.props
-    let widget = window.cloudinary.createUploadWidget(
+interface CloudinaryUploadWidgetProps {
+  callback: (image: CloudinaryCallbackImage) => void
+  children: (props: ChildrenProps) => ReactNode
+}
+
+export default function CloudinaryUploadWidget({ callback, children }: CloudinaryUploadWidgetProps) {
+  function showWidget() {
+    const widget: CloudinaryWidget = window.cloudinary.createUploadWidget(
       {
         cloudName: 'vercel-platforms',
         uploadPreset: 'w0vnflc6',
         cropping: true
       },
-      (error, result) => {
+      (error: unknown | undefined, result: CloudinaryWidgetResult) => {
         if (!error && result && result.event === 'success') {
           callback(result.info)
         }
       }
     )
+
     widget.open()
   }
 
-  open = (e) => {
+  function open(e: MouseEvent) {
     e.preventDefault()
-    this.showWidget()
+    showWidget()
   }
 
-  render() {
-    return (
-      <>
-        <Head>
-          // this is Next.js specific, but if you're using something like Create React App, // you could
-          download the script in componentDidMount using this method:
-          https://stackoverflow.com/a/34425083/1424568
-          <script src='https://widget.cloudinary.com/v2.0/global/all.js' type='text/javascript' />
-        </Head>
-        {this.props.children({ open: this.open })}
-      </>
-    )
-  }
+  return (
+    <>
+      <Head>
+        // this is Next.js specific, but if you're using something like Create React App, // you could
+        download the script in componentDidMount using this method:
+        https://stackoverflow.com/a/34425083/1424568
+        <script src='https://widget.cloudinary.com/v2.0/global/all.js' type='text/javascript' />
+      </Head>
+      {children({ open })}
+    </>
+  )
 }

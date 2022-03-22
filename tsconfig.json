@@ -16,13 +16,16 @@
     "jsx": "preserve", // next.js implements its own optimized jsx transform
     "baseUrl": ".", // need adjustment when using absolute import
     "paths": {
-      "@/components/*": ["./components/*"],
-      "@/libraries/*": ["./libraries/*"],
+      "@/data/*": ["data/*"],
+      "@/layouts/*": ["layouts/*"],
+      "@/components/*": ["components/*"],
+      "@/libraries/*": ["libraries/*"],
       "@/styles/*": ["./styles/*"],
-      "~/*": ["./public/*"]
+      "@/types": ["types/index"],
+      "@/types/*": ["types/*"],
+      "~/*": ["public/*"]
     }
   },
-  "moduleResolution": ["node_modules", ".next", "node"],
   "include": ["next-env.d.ts", "next-modules.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]
 }

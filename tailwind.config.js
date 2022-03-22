@@ -1,21 +1,16 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
-const colors = require('tailwindcss/colors')
 
 module.exports = {
-  content: [
-    './components/**/*.{js,ts,jsx,tsx}',
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './libraries/**/*.{js,ts,jsx,tsx}'
-  ],
-  darkMode: 'class',
+  content: ['./components/**/*.{js,ts,jsx,tsx}', './pages/**/*.{js,ts,jsx,tsx}'],
+  darkMode: 'media',
   theme: {
+    fontFamily: {
+      sans: ['Be Vietnam Pro', ...defaultTheme.fontFamily.sans],
+      mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono]
+    },
     extend: {
-      fontFamily: {
-        sans: ['Be Vietnam Pro', ...defaultTheme.fontFamily.sans],
-        mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono]
-      },
-      screens: {
-        standalone: { raw: '(display-mode: standalone)' }
+      colors: {
+        current: 'currentColor'
       },
       width: {
         1536: '1536px'
@@ -26,90 +21,27 @@ module.exports = {
       margin: {
         30: '7.5rem'
       },
-      colors: {
-        gray: colors.neutral,
-        primary: colors.blue,
-        secondary: colors.indigo,
-        current: 'currentColor'
+      fontFamily: {
+        sans: ['Inter var', ...defaultTheme.fontFamily.sans],
+        mono: ['Consolas', ...defaultTheme.fontFamily.mono]
       },
-      typography: (theme) => ({
+      typography: {
         DEFAULT: {
           css: {
-            color: theme('colors.slate.700'),
-            a: {
-              color: theme('colors.slate.900'),
-              '&:hover': {},
-              textDecorationColor: theme('colors.teal.500'),
-              textUnderlineOffset: '3px',
-              textDecorationStyle: 'decoration-solid',
-              code: { color: theme('colors.blue.400') }
+            h1: {
+              fontFamily: 'Cal Sans'
             },
-            blockquote: {
-              borderLeftColor: theme('colors.teal.500'),
-              backgroundColor: theme('colors.gray.50'),
-              color: theme('colors.gray.700')
+            h2: {
+              fontFamily: 'Cal Sans'
             },
-            'h1,h2,h3,h4': {
-              color: theme('colors.gray.900')
+            h3: {
+              fontFamily: 'Cal Sans'
             },
-            hr: { borderColor: theme('colors.gray.700') },
-            strong: { color: theme('colors.gray.700') },
-            thead: {
-              color: theme('colors.gray.100'),
-              borderBottomColor: theme('colors.gray.600')
-            },
-            tbody: {
-              tr: {
-                borderBottomColor: theme('colors.gray.700')
-              }
-            },
-            code: { color: theme('colors.indigo.500') },
             'blockquote p:first-of-type::before': { content: 'none' },
-            'blockquote p:first-of-type::after': { content: 'none' },
-            pre: {
-              backgroundColor: theme('colors.gray.100')
-            }
-          }
-        },
-        dark: {
-          css: {
-            color: theme('colors.slate.100'),
-            a: {
-              color: theme('colors.slate.50'),
-              '&:hover': {
-                color: theme('colors.teal.500')
-              },
-              textDecorationColor: theme('colors.teal.400'),
-              textUnderlineOffset: '3px',
-              textDecorationStyle: 'decoration-solid',
-              code: { color: theme('colors.blue.400') }
-            },
-            blockquote: {
-              borderLeftColor: theme('colors.teal.500'),
-              backgroundColor: theme('colors.slate.800'),
-              color: theme('colors.gray.200')
-            },
-            'h1,h2,h3,h4': {
-              color: theme('colors.white')
-            },
-            hr: { borderColor: theme('colors.gray.600') },
-            strong: { color: theme('colors.gray.100') },
-            thead: {
-              color: theme('colors.gray.100'),
-              borderBottomColor: theme('colors.gray.600')
-            },
-            tbody: {
-              tr: {
-                borderBottomColor: theme('colors.gray.700')
-              }
-            },
-            code: { color: theme('colors.indigo.200') },
-            pre: {
-              backgroundColor: theme('colors.primary.800')
-            }
+            'blockquote p:first-of-type::after': { content: 'none' }
           }
         }
-      }),
+      },
       keyframes: {
         wiggle: {
           '0%, 100%': {

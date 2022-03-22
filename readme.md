@@ -1,4 +1,4 @@
-<p align="center"><img src="./banner.png" width="500" height="150" alt="Project Logo"></p>
+<p align="center"><img src="./public/banner.png" width="500" height="150" alt="Project Logo"></p>
 <p align="center">
     <a href="https://github.com/riipandi/next-platform/pulse">
         <img src="https://img.shields.io/badge/Contributions-welcome-blue.svg?style=flat-square" alt="Contribution welcome">

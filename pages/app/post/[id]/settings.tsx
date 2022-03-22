@@ -1,8 +1,12 @@
 import { useRouter } from 'next/router'
+import type { ChangeEvent } from 'react'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import useSWR from 'swr'
+import type { WithSitePost } from '@/types'
+import { HttpMethod } from '@/types'
 
+import { fetcher } from '@/libraries/fetcher'
 import saveImage from '@/libraries/save-image'
 
 import Layout from '@/components/app/Layout'
@@ -12,67 +16,86 @@ import BlurImage from '@/components/BlurImage'
 import CloudinaryUploadWidget from '@/components/Cloudinary'
 import Modal from '@/components/Modal'
 
-const fetcher = (...args) => fetch(...args).then((res) => res.json())
+interface SettingsData {
+  slug: string
+  id: string
+  image: string
+  imageBlurhash: string
+}
 
 export default function PostSettings() {
   const router = useRouter()
-  const { id } = router.query
-  const postId = id
 
-  const { data: settings, isValidating } = useSWR(`/api/post?postId=${postId}`, fetcher, {
-    revalidateOnFocus: false,
-    onError: () => {
-      router.push('/')
-    }
+  // TODO: Undefined check redirects to error
+  const { id: postId } = router.query
+
+  const { data: settings, isValidating } = useSWR<WithSitePost>(`/api/post?postId=${postId}`, fetcher, {
+    onError: () => router.push('/'),
+    revalidateOnFocus: false
   })
 
   const [saving, setSaving] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deletingPost, setDeletingPost] = useState(false)
 
-  const [data, setData] = useState({
-    image: settings?.image,
-    imageBlurhash: settings?.imageBlurhash
+  const [data, setData] = useState<SettingsData>({
+    image: settings?.image ?? '',
+    imageBlurhash: settings?.imageBlurhash ?? '',
+    slug: settings?.slug ?? '',
+    id: settings?.id ?? ''
   })
 
   useEffect(() => {
     if (settings)
       setData({
         slug: settings.slug,
-        image: settings.image,
-        imageBlurhash: settings.imageBlurhash
+        image: settings.image ?? '',
+        imageBlurhash: settings.imageBlurhash ?? '',
+        id: settings.id
       })
   }, [settings])
 
-  async function savePostSettings(data) {
+  async function savePostSettings(data: SettingsData) {
     setSaving(true)
-    const response = await fetch('/api/post', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        id: postId,
-        slug: data.slug,
-        subdomain: settings.site.subdomain,
-        customDomain: settings.site.customDomain,
-        image: data.image,
-        imageBlurhash: data.imageBlurhash
+
+    try {
+      const response = await fetch('/api/post', {
+        method: HttpMethod.PUT,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          id: postId,
+          slug: data.slug,
+          image: data.image,
+          imageBlurhash: data.imageBlurhash,
+          subdomain: settings?.site?.subdomain,
+          customDomain: settings?.site?.customDomain
+        })
       })
-    })
-    if (response.ok) {
+
+      if (response.ok) toast.success(`Changes Saved`)
+    } catch (error) {
+      console.error(error)
+    } finally {
       setSaving(false)
-      toast.success(`Changes Saved`)
     }
   }
 
-  async function deletePost(postId) {
+  async function deletePost(postId: string) {
     setDeletingPost(true)
-    const response = await fetch(`/api/post?postId=${postId}`, {
-      method: 'DELETE'
-    })
-    if (response.ok) {
-      router.push(`/site/${settings.site.id}`)
+    try {
+      const response = await fetch(`/api/post?postId=${postId}`, {
+        method: HttpMethod.DELETE
+      })
+
+      if (response.ok) {
+        router.push(`/site/${settings?.site?.id}`)
+      }
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setDeletingPost(false)
     }
   }
 
@@ -85,34 +108,36 @@ export default function PostSettings() {
 
   return (
     <>
-      <Layout siteId={settings?.site.id}>
+      <Layout siteId={settings?.site?.id}>
         <Toaster
           position='top-right'
           toastOptions={{
             duration: 10000
           }}
         />
-        <div className='max-w-screen-xl mx-auto px-10 sm:px-20 mt-20 mb-16'>
-          <h1 className='font-cal text-5xl mb-12'>Post Settings</h1>
-          <div className='mb-28 flex flex-col space-y-12'>
+        <div className='max-w-screen-xl px-10 mx-auto mt-20 mb-16 sm:px-20'>
+          <h1 className='mb-12 text-5xl font-cal'>Post Settings</h1>
+          <div className='flex flex-col space-y-12 mb-28'>
             <div className='space-y-6'>
-              <h2 className='font-cal text-2xl'>Post Slug</h2>
-              <div className='border border-gray-700 rounded-lg flex items-center max-w-lg'>
-                <span className='px-5 font-cal rounded-l-lg border-r border-gray-600 whitespace-nowrap'>
-                  {settings?.site.subdomain}.vercel.pub/
+              <h2 className='text-2xl font-cal'>Post Slug</h2>
+              <div className='flex items-center max-w-lg border border-gray-700 rounded-lg'>
+                <span className='px-5 border-r border-gray-600 rounded-l-lg font-cal whitespace-nowrap'>
+                  {settings?.site?.subdomain}.mystream.page/
                 </span>
                 <input
-                  className='w-full px-5 py-3 font-cal text-gray-700 bg-white border-none focus:outline-none focus:ring-0 rounded-none rounded-r-lg placeholder-gray-400'
+                  className='w-full px-5 py-3 text-gray-700 placeholder-gray-400 bg-white border-none rounded-none rounded-r-lg font-cal focus:outline-none focus:ring-0'
                   type='text'
                   name='slug'
                   placeholder='post-slug'
                   value={data?.slug}
-                  onInput={(e) => setData((data) => ({ ...data, slug: e.target.value }))}
+                  onInput={(e: ChangeEvent<HTMLInputElement>) =>
+                    setData((data) => ({ ...data, slug: e.target.value }))
+                  }
                 />
               </div>
             </div>
             <div className='space-y-6'>
-              <h2 className='font-cal text-2xl'>Thumbnail Image</h2>
+              <h2 className='text-2xl font-cal'>Thumbnail Image</h2>
               <div
                 className={`${
                   data.image ? '' : 'animate-pulse bg-gray-300 h-150'
@@ -122,7 +147,7 @@ export default function PostSettings() {
                   {({ open }) => (
                     <button
                       onClick={open}
-                      className='absolute w-full h-full rounded-md bg-gray-200 z-10 flex flex-col justify-center items-center opacity-0 hover:opacity-100 transition-all ease-linear duration-200'
+                      className='absolute z-10 flex flex-col items-center justify-center w-full h-full transition-all duration-200 ease-linear bg-gray-200 rounded-md opacity-0 hover:opacity-100'
                     >
                       <svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24'>
                         <path d='M16 16h-3v5h-2v-5h-3l4-4 4 4zm3.479-5.908c-.212-3.951-3.473-7.092-7.479-7.092s-7.267 3.141-7.479 7.092c-2.57.463-4.521 2.706-4.521 5.408 0 3.037 2.463 5.5 5.5 5.5h3.5v-2h-3.5c-1.93 0-3.5-1.57-3.5-3.5 0-2.797 2.479-3.833 4.433-3.72-.167-4.218 2.208-6.78 5.567-6.78 3.453 0 5.891 2.797 5.567 6.78 1.745-.046 4.433.751 4.433 3.72 0 1.93-1.57 3.5-3.5 3.5h-3.5v2h3.5c3.037 0 5.5-2.463 5.5-5.5 0-2.702-1.951-4.945-4.521-5.408z' />
@@ -148,8 +173,8 @@ export default function PostSettings() {
               </div>
 
               <div className='w-full h-10' />
-              <div className='flex flex-col space-y-6 max-w-lg'>
-                <h2 className='font-cal text-2xl'>Delete Post</h2>
+              <div className='flex flex-col max-w-lg space-y-6'>
+                <h2 className='text-2xl font-cal'>Delete Post</h2>
                 <p>
                   Permanently delete your post and all of its contents from our platform. This action is not
                   reversible – please continue with caution.
@@ -158,7 +183,7 @@ export default function PostSettings() {
                   onClick={() => {
                     setShowDeleteModal(true)
                   }}
-                  className='bg-red-500 text-white border-red-500 hover:text-red-500 hover:bg-white px-5 py-3 max-w-max font-cal border-solid border rounded-md focus:outline-none transition-all ease-in-out duration-150'
+                  className='px-5 py-3 text-white transition-all duration-150 ease-in-out bg-red-500 border border-red-500 border-solid rounded-md hover:text-red-500 hover:bg-white max-w-max font-cal focus:outline-none'
                 >
                   Delete Post
                 </button>
@@ -170,20 +195,20 @@ export default function PostSettings() {
           <form
             onSubmit={async (event) => {
               event.preventDefault()
-              await deletePost(postId)
+              await deletePost(postId as string)
             }}
-            className='inline-block w-full max-w-md pt-8 overflow-hidden text-center align-middle transition-all bg-white shadow-xl rounded-lg'
+            className='inline-block w-full max-w-md pt-8 overflow-hidden text-center align-middle transition-all bg-white rounded-lg shadow-xl'
           >
-            <h2 className='font-cal text-2xl mb-6'>Delete Post</h2>
-            <div className='grid gap-y-5 w-5/6 mx-auto'>
-              <p className='text-gray-600 mb-3'>
+            <h2 className='mb-6 text-2xl font-cal'>Delete Post</h2>
+            <div className='grid w-5/6 mx-auto gap-y-5'>
+              <p className='mb-3 text-gray-600'>
                 Are you sure you want to delete your post? This action is not reversible.
               </p>
             </div>
-            <div className='flex justify-between items-center mt-10 w-full'>
+            <div className='flex items-center justify-between w-full mt-10'>
               <button
                 type='button'
-                className='w-full px-5 py-5 text-sm text-gray-400 hover:text-black border-t border-gray-300 rounded-bl focus:outline-none focus:ring-0 transition-all ease-in-out duration-150'
+                className='w-full px-5 py-5 text-sm text-gray-400 transition-all duration-150 ease-in-out border-t border-gray-300 rounded-bl hover:text-black focus:outline-none focus:ring-0'
                 onClick={() => setShowDeleteModal(false)}
               >
                 CANCEL
@@ -203,8 +228,8 @@ export default function PostSettings() {
             </div>
           </form>
         </Modal>
-        <footer className='h-20 z-20 fixed bottom-0 inset-x-0 border-solid border-t border-gray-500 bg-white'>
-          <div className='max-w-screen-xl mx-auto px-10 sm:px-20 h-full flex justify-end items-center'>
+        <footer className='fixed inset-x-0 bottom-0 z-20 h-20 bg-white border-t border-gray-500 border-solid'>
+          <div className='flex items-center justify-end h-full max-w-screen-xl px-10 mx-auto sm:px-20'>
             <button
               onClick={() => {
                 savePostSettings(data)

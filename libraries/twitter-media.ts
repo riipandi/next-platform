@@ -1,4 +1,12 @@
-export const getTwitterMedia = async (id: string) => {
+import type { MediaTweet } from '@/types'
+
+interface Video {
+  bitrate: number
+  content_type: string
+  url: string
+}
+
+export async function getTwitterMedia(id: string): Promise<Video | undefined> {
   try {
     const response = await fetch(
       `https://api.twitter.com/1.1/statuses/show.json?id=${id}&tweet_mode=extended`,
@@ -8,19 +16,20 @@ export const getTwitterMedia = async (id: string) => {
         }
       }
     )
-    const data = await response.json()
-    const videoData = data.extended_entities.media[0].video_info
 
-    // filter for only MP4 videos
-    const mp4VideosOnly = videoData.variants.filter((variant) => variant.content_type === 'video/mp4')
+    if (!response.ok) throw new Error('Failed to fetch Twitter media')
 
-    // get the video with the best bitrate
-    const bestVideoBitrate = mp4VideosOnly.reduce(function (prev, current) {
-      return prev.bitrate > current.bitrate ? prev : current
-    })
+    const data = (await response.json()) as MediaTweet
 
-    return bestVideoBitrate
+    return (
+      data.extended_entities.media[0].video_info.variants
+        // Filter to only include MP4 videos
+        .filter((variant) => variant.content_type === 'video/mp4')
+
+        // Get the video with the best bitrate
+        .reduce((prev, current) => (prev.bitrate > current.bitrate ? prev : current))
+    )
   } catch (error) {
-    console.log(id, error)
+    console.error(id, error)
   }
 }

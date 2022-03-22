@@ -1,7 +1,13 @@
 import { Dialog, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
+import type { WithChildren } from '@/types'
 
-export default function Modal({ children, showModal, setShowModal }) {
+interface ModalProps extends WithChildren {
+  showModal: boolean
+  setShowModal: (state: boolean) => void
+}
+
+export default function Modal({ children, showModal, setShowModal }: ModalProps) {
   return (
     <>
       <Transition appear show={showModal} as={Fragment}>

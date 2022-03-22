@@ -1,24 +1,23 @@
-export async function revalidate(domain: string, slug: any) {
+import { HttpMethod } from "@/types";
+
+export async function revalidate(domain?: string | null, slug?: string) {
+  const urlPaths = [`/${slug}`, `/`];
+
   try {
-    await fetch(`${domain}/api/revalidate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        urlPath: `/`
-      })
-    })
-    await fetch(`${domain}/api/revalidate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        urlPath: `/${slug}`
-      })
-    })
-  } catch (e) {
-    console.error(e)
+    await Promise.all(
+      urlPaths.map((urlPath) =>
+        fetch(`${domain}/api/revalidate`, {
+          method: HttpMethod.POST,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            urlPath,
+          }),
+        })
+      )
+    );
+  } catch (err) {
+    console.error(err);
   }
 }

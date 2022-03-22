@@ -1,4 +1,8 @@
-const PlusIcon = ({ color, width, height, className }) => {
+import type { BaseIconProps } from '@/types'
+
+type PlusIconProps = BaseIconProps
+
+const PlusIcon = ({ color, width, height, className }: PlusIconProps) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'

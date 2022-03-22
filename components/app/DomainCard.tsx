@@ -1,14 +1,28 @@
-import useSWR, { mutate } from 'swr'
-const fetcher = (...args) => fetch(...args).then((res) => res.json())
+import type { Site } from '@prisma/client'
 import { useState } from 'react'
+import useSWR, { mutate } from 'swr'
+import { HttpMethod } from '@/types'
+
+import { fetcher } from '@/libraries/fetcher'
 
 import LoadingDots from '@/components/app/loading-dots'
 
-const DomainCard = ({ data, setData }: { data: any; setData: any }) => {
-  const { data: valid, isValidating } = useSWR(`/api/check-domain?domain=${data.customDomain}`, fetcher, {
-    revalidateOnMount: true,
-    refreshInterval: 5000
-  })
+type DomainData = Pick<
+  Site,
+  'customDomain' | 'description' | 'id' | 'image' | 'imageBlurhash' | 'name' | 'subdomain'
+>
+
+interface DomainCardProps<T = DomainData> {
+  data: T
+  setData: (data: T) => void
+}
+
+export default function DomainCard({ data, setData }: DomainCardProps) {
+  const { data: valid, isValidating } = useSWR<Site>(
+    `/api/domain/check?domain=${data.customDomain}`,
+    fetcher,
+    { revalidateOnMount: true, refreshInterval: 5000 }
+  )
   const [recordType, setRecordType] = useState('CNAME')
   const [removing, setRemoving] = useState(false)
 
@@ -43,7 +57,7 @@ const DomainCard = ({ data, setData }: { data: any; setData: any }) => {
         <div className='flex space-x-3'>
           <button
             onClick={() => {
-              mutate(`/api/check-domain?domain=${data.customDomain}`)
+              mutate(`/api/domain/check?domain=${data.customDomain}`)
             }}
             disabled={isValidating}
             className={`${
@@ -55,7 +69,9 @@ const DomainCard = ({ data, setData }: { data: any; setData: any }) => {
           <button
             onClick={async () => {
               setRemoving(true)
-              await fetch(`/api/remove-domain?domain=${data.customDomain}&siteId=${data.id}`).then((res) => {
+              await fetch(`/api/domain?domain=${data.customDomain}&siteId=${data.id}`, {
+                method: HttpMethod.DELETE
+              }).then((res) => {
                 setRemoving(false)
                 if (res.ok) {
                   setData({ ...data, customDomain: null })
@@ -138,7 +154,7 @@ const DomainCard = ({ data, setData }: { data: any; setData: any }) => {
                 <div>
                   <p className='text-sm font-bold'>Value</p>
                   <p className='mt-2 font-mono text-sm'>
-                    {recordType == 'CNAME' ? `cname.vercel.pub` : `76.76.21.21`}
+                    {recordType == 'CNAME' ? `cname.mystream.page` : `76.76.21.21`}
                   </p>
                 </div>
               </div>
@@ -149,5 +165,3 @@ const DomainCard = ({ data, setData }: { data: any; setData: any }) => {
     </div>
   )
 }
-
-export default DomainCard

@@ -3,8 +3,15 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
+import type { Meta, WithChildren } from '@/types'
 
-export default function Layout({ meta, children, subdomain }) {
+interface LayoutProps extends WithChildren {
+  meta?: Meta
+  siteId?: string
+  subdomain?: string
+}
+
+export default function Layout({ meta, children, subdomain }: LayoutProps) {
   const [scrolled, setScrolled] = useState(false)
 
   const onScroll = useCallback(() => {
@@ -16,11 +23,11 @@ export default function Layout({ meta, children, subdomain }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [onScroll])
 
-  const [closeModal, setCloseModal] = useState(Cookies.get('closeModal'))
+  const [closeModal, setCloseModal] = useState<boolean>(!!Cookies.get('closeModal'))
 
   useEffect(() => {
     if (closeModal) {
-      Cookies.set('closeModal', true)
+      Cookies.set('closeModal', 'true')
     } else {
       Cookies.remove('closeModal')
     }
@@ -62,11 +69,13 @@ export default function Layout({ meta, children, subdomain }) {
         }  top-0 left-0 right-0 h-16 bg-white z-30 transition-all ease duration-150 flex`}
       >
         <div className='flex items-center justify-center h-full max-w-screen-xl px-10 mx-auto space-x-5 sm:px-20'>
-          <Link href='/'>
+          <Link href='/' passHref>
             <a className='flex items-center justify-center'>
-              <div className='inline-block w-8 h-8 overflow-hidden align-middle rounded-full'>
-                <Image src={meta?.logo} width={40} height={40} alt={meta?.title} />
-              </div>
+              {meta?.logo && (
+                <div className='inline-block w-8 h-8 overflow-hidden align-middle rounded-full'>
+                  <Image alt={meta?.title} height={40} src={meta?.logo} width={40} />
+                </div>
+              )}
               <span className='inline-block ml-3 font-medium truncate'>{meta?.title}</span>
             </a>
           </Link>
@@ -103,14 +112,14 @@ export default function Layout({ meta, children, subdomain }) {
             </svg>
           </button>
           <div className='text-center lg:text-left'>
-            <p className='text-lg text-black font-cal sm:text-2xl'>Next.js Platform Demo</p>
+            <p className='text-lg text-black font-cal sm:text-2xl'>Platforms Starter Kit Demo</p>
             <p className={`${closeModal ? 'lg:block hidden' : ''} text-sm text-gray-700 mt-2 lg:mt-0`}>
               This is a demo site showcasing how to build a multi-tenant application with{' '}
               <a
                 href='https://platformize.co'
                 target='_blank'
-                rel='noreferrer noopener'
                 className='font-semibold text-black underline'
+                rel='noreferrer'
               >
                 custom domain
               </a>{' '}
@@ -123,18 +132,18 @@ export default function Layout({ meta, children, subdomain }) {
             } flex space-y-3 sm:space-y-0 sm:space-x-3 sm:flex-row flex-col lg:w-auto w-full text-center`}
           >
             <a
-              href='https://app.vercel.pub'
+              href='https://app.mystream.page'
               target='_blank'
-              rel='noreferrer noopener'
               className='flex-auto px-5 py-1 text-lg text-black whitespace-no-wrap transition-all duration-150 ease-in-out border border-gray-200 rounded-md font-cal sm:py-3 hover:border-black'
+              rel='noreferrer'
             >
               Create your publication
             </a>
             <a
               href='https://vercel.com/guides/nextjs-multi-tenant-application'
               target='_blank'
-              rel='noreferrer noopener'
               className='flex-auto px-5 py-1 text-lg text-white whitespace-no-wrap transition-all duration-150 ease-in-out bg-black border border-black rounded-md font-cal sm:py-3 hover:text-black hover:bg-white'
+              rel='noreferrer'
             >
               Clone and deploy
             </a>

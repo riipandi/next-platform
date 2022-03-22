@@ -1,4 +1,8 @@
-const NotFoundIcon = ({ color, width, height, className }) => {
+import type { BaseIconProps } from '@/types'
+
+type NotFoundIconProps = BaseIconProps
+
+const NotFoundIcon = ({ className, color, height, width }: NotFoundIconProps) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'

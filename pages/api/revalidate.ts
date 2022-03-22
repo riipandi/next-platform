@@ -1,10 +1,17 @@
-export default async function handler(req, res) {
-  const urlPath = req.body.urlPath
+import type { NextApiRequest, NextApiResponse } from 'next'
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { urlPath } = req.body
+
   try {
     await res.unstable_revalidate(urlPath)
-  } catch {
-    res.status(500)
-    return res.json({ message: `Failed to revalidate "${urlPath}"` })
+
+    res.status(200).json({
+      message: 'OK'
+    })
+  } catch (error) {
+    res.status(500).json({
+      message: `Failed to revalidate "${urlPath}"`
+    })
   }
-  return res.json({ message: 'OK' })
 }

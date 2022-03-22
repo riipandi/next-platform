@@ -1,5 +1,10 @@
+import type { GetStaticPaths, GetStaticProps } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import type { ParsedUrlQuery } from 'querystring'
+import type { _SiteData, Meta } from '@/types'
+
+import prisma from '@/libraries/prisma'
 
 import BlogCard from '@/components/BlogCard'
 import BlurImage from '@/components/BlurImage'
@@ -7,55 +12,76 @@ import Date from '@/components/Date'
 import Layout from '@/components/sites/Layout'
 import Loader from '@/components/sites/Loader'
 
-import prisma from '@/libraries/prisma'
+interface PathProps extends ParsedUrlQuery {
+  site: string
+}
 
-export default function Index(props) {
+interface IndexProps {
+  stringifiedData: string
+}
+
+export default function Index({ stringifiedData }: IndexProps) {
   const router = useRouter()
-  if (router.isFallback) {
-    return <Loader />
-  }
+  if (router.isFallback) return <Loader />
 
-  const data = JSON.parse(props.data)
+  const data = JSON.parse(stringifiedData) as _SiteData
 
   const meta = {
     title: data.name,
     description: data.description,
-    ogUrl: data.customDomain ? data.customDomain : `https://${data.subdomain}.vercel.pub`,
+    logo: '/logo.png',
     ogImage: data.image,
-    logo: '/logo.png'
-  }
+    ogUrl: data.customDomain ? data.customDomain : `https://${data.subdomain}.mystream.page`
+  } as Meta
 
   return (
-    <Layout meta={meta} subdomain={data.subdomain}>
+    <Layout meta={meta} subdomain={data.subdomain ?? undefined}>
       <div className='w-full mb-20'>
         {data.posts.length > 0 ? (
           <div className='w-full max-w-screen-xl mx-auto lg:w-5/6 md:mb-28'>
             <Link href={`/${data.posts[0].slug}`}>
               <a>
                 <div className='relative w-full mx-auto overflow-hidden group h-80 sm:h-150 lg:rounded-xl'>
-                  <BlurImage
-                    src={data.posts[0].image}
-                    alt={data.posts[0].title}
-                    layout='fill'
-                    objectFit='cover'
-                    className='group-hover:scale-105 group-hover:duration-300'
-                    placeholder='blur'
-                    blurDataURL={data.posts[0].imageBlurhash}
-                  />
+                  {data.posts[0].image ? (
+                    <BlurImage
+                      alt={data.posts[0].title ?? ''}
+                      blurDataURL={data.posts[0].imageBlurhash ?? undefined}
+                      className='group-hover:scale-105 group-hover:duration-300'
+                      layout='fill'
+                      objectFit='cover'
+                      placeholder='blur'
+                      src={data.posts[0].image}
+                    />
+                  ) : (
+                    <div className='absolute flex items-center justify-center w-full h-full text-4xl text-gray-500 bg-gray-100 select-none'>
+                      ?
+                    </div>
+                  )}
                 </div>
                 <div className='w-5/6 mx-auto mt-10 lg:w-full'>
                   <h2 className='my-10 text-4xl font-cal md:text-6xl'>{data.posts[0].title}</h2>
                   <p className='w-full text-base md:text-lg lg:w-2/3'>{data.posts[0].description}</p>
                   <div className='flex items-center justify-start w-full space-x-4'>
                     <div className='relative flex-none w-8 h-8 overflow-hidden rounded-full'>
-                      <BlurImage layout='fill' objectFit='cover' src={data.user.image} />
+                      {data.user?.image ? (
+                        <BlurImage
+                          alt={data.user?.name ?? 'User Avatar'}
+                          layout='fill'
+                          objectFit='cover'
+                          src={data.user?.image}
+                        />
+                      ) : (
+                        <div className='absolute flex items-center justify-center w-full h-full text-4xl text-gray-500 bg-gray-100 select-none'>
+                          ?
+                        </div>
+                      )}
                     </div>
                     <p className='inline-block ml-3 text-sm font-semibold align-middle md:text-base whitespace-nowrap'>
-                      {data.user.name}
+                      {data.user?.name}
                     </p>
                     <div className='h-6 border-l border-gray-600' />
                     <p className='w-10/12 m-auto my-5 text-sm font-light text-gray-500 md:text-base'>
-                      <Date dateString={data.posts[0].createdAt} />
+                      <Date dateString={data.posts[0].createdAt.toString()} />
                     </p>
                   </div>
                 </div>
@@ -91,54 +117,65 @@ export default function Index(props) {
   )
 }
 
-export async function getStaticPaths() {
-  const subdomains = await prisma.site.findMany({
-    // you can remove this if you want to generate all sites at build time
-    where: {
-      subdomain: 'demo'
-    },
-    select: {
-      subdomain: true
-    }
-  })
-  const customDomains = await prisma.site.findMany({
-    where: {
-      NOT: {
-        customDomain: null
-      },
+export const getStaticPaths: GetStaticPaths<PathProps> = async () => {
+  const [subdomains, customDomains] = await Promise.all([
+    prisma.site.findMany({
       // you can remove this if you want to generate all sites at build time
-      customDomain: 'platformize.co'
-    },
-    select: {
-      customDomain: true
-    }
-  })
-  const allPaths = [
-    ...subdomains.map((subdomain) => {
-      return subdomain.subdomain
+      where: {
+        subdomain: 'demo'
+      },
+      select: {
+        subdomain: true
+      }
     }),
-    ...customDomains.map((customDomain) => {
-      return customDomain.customDomain
+    prisma.site.findMany({
+      where: {
+        NOT: {
+          customDomain: null
+        },
+        // you can remove this if you want to generate all sites at build time
+        customDomain: 'platformize.co'
+      },
+      select: {
+        customDomain: true
+      }
     })
-  ]
+  ])
+
+  const allPaths = [
+    ...subdomains.map(({ subdomain }) => subdomain),
+    ...customDomains.map(({ customDomain }) => customDomain)
+  ].filter((path) => path) as Array<string>
+
   return {
-    paths: allPaths.map((path) => {
-      return { params: { site: path } }
-    }),
+    paths: allPaths.map((path) => ({
+      params: {
+        site: path
+      }
+    })),
     fallback: true
   }
 }
 
-export async function getStaticProps({ params: { site } }) {
-  let filter = {
+export const getStaticProps: GetStaticProps<IndexProps, PathProps> = async ({ params }) => {
+  if (!params) throw new Error('No path parameters found')
+
+  const { site } = params
+
+  let filter: {
+    subdomain?: string
+    customDomain?: string
+  } = {
     subdomain: site
   }
+
   if (site.includes('.')) {
     filter = {
       customDomain: site
     }
   }
-  const data = await prisma.site.findUnique({
+
+  const data = (await prisma.site.findUnique({
     where: filter,
     include: {
       user: true,
@@ -153,15 +190,13 @@ export async function getStaticProps({ params: { site } }) {
         ]
       }
     }
-  })
+  })) as _SiteData
 
-  if (!data) {
-    return { notFound: true, revalidate: 10 }
-  }
+  if (!data) return { notFound: true, revalidate: 10 }
 
   return {
     props: {
-      data: JSON.stringify(data)
+      stringifiedData: JSON.stringify(data)
     },
     revalidate: 3600
   }

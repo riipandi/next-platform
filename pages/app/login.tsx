@@ -14,10 +14,12 @@ const description =
 export default function Login() {
   const [loading, setLoading] = useState(false)
 
-  //Get error message added by next/auth in URL.
-  const { error } = useRouter().query
+  // Get error message added by next/auth in URL.
+  const { query } = useRouter()
+  const { error } = query
+
   useEffect(() => {
-    const errorMessage = Array.isArray(error) ? error.pop(error) : error
+    const errorMessage = Array.isArray(error) ? error.pop() : error
     errorMessage && toast.error(errorMessage)
   }, [error])
 
@@ -53,7 +55,15 @@ export default function Login() {
         <img className='w-auto h-12 mx-auto' src='/logo.png' alt='Platforms Starter Kit' />
         <h2 className='mt-6 text-3xl font-extrabold text-center text-gray-900'>Platforms Starter Kit</h2>
         <p className='mt-2 text-sm text-center text-gray-600'>
-          Build multi-tenant applications with custom domains.
+          Build multi-tenant applications with custom domains. <br /> Read the{' '}
+          <a
+            href='https://demo.mystream.page/platforms-starter-kit'
+            target='_blank'
+            className='font-medium text-black hover:text-gray-800'
+            rel='noreferrer'
+          >
+            blog post
+          </a>
         </p>
       </div>
 
