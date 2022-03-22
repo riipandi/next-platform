@@ -4,7 +4,7 @@
 import type { Example, PrismaClient } from '@prisma/client'
 import Link from 'next/link'
 import type { Literal, Node } from 'unist'
-import visit from 'unist-util-visit'
+import * as visit from 'unist-util-visit'
 import type { WithChildren } from '@/types'
 
 import { getTweets } from '@/libraries/twitter'
