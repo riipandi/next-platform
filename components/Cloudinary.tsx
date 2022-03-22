@@ -1,4 +1,4 @@
-import Head from 'next/head';
+// import Head from 'next/head';
 import type { MouseEvent, ReactNode } from 'react';
 import type { CloudinaryCallbackImage, CloudinaryWidget, CloudinaryWidgetResult } from '@/types';
 
@@ -15,8 +15,8 @@ export default function CloudinaryUploadWidget({ callback, children }: Cloudinar
   function showWidget() {
     const widget: CloudinaryWidget = window.cloudinary.createUploadWidget(
       {
-        cloudName: 'vercel-platforms',
-        uploadPreset: 'w0vnflc6',
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME || 'ripandis',
+        uploadPreset: process.env.CLOUDINARY_UPLOAD_PRESET || 'vplatform',
         cropping: true
       },
       (error: unknown | undefined, result: CloudinaryWidgetResult) => {
@@ -36,12 +36,12 @@ export default function CloudinaryUploadWidget({ callback, children }: Cloudinar
 
   return (
     <>
-      <Head>
-        // this is Next.js specific, but if you're using something like Create React App, // you could
-        download the script in componentDidMount using this method:
-        https://stackoverflow.com/a/34425083/1424568
+      {/* This is Next.js specific, but if you're using something like Create React App,
+      you could download the script in componentDidMount using this method:
+      https://stackoverflow.com/a/34425083/1424568 */}
+      {/* <Head>
         <script src='https://widget.cloudinary.com/v2.0/global/all.js' type='text/javascript' />
-      </Head>
+      </Head> */}
       {children({ open })}
     </>
   );

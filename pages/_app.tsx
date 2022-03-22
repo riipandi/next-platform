@@ -1,4 +1,5 @@
 import type { AppProps } from 'next/app';
+import Script from 'next/script';
 import { SessionProvider } from 'next-auth/react';
 import { ThemeProvider } from 'next-themes';
 import { useEffect } from 'react';
@@ -15,6 +16,7 @@ export default function MyApp({ Component, pageProps: { session, ...pageProps } 
 
   return (
     <ThemeProvider attribute='class' defaultTheme='light' enableSystem={false}>
+      <Script src='https://widget.cloudinary.com/v2.0/global/all.js' strategy='lazyOnload' />
       <SessionProvider session={session}>
         <Component {...pageProps} />
       </SessionProvider>

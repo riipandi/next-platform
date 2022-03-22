@@ -17,8 +17,6 @@ export default function AppSettings() {
   const [saving, setSaving] = useState<boolean>(false);
   const [data, setData] = useState<UserSettings | null>(null);
 
-  console.log(session);
-
   const nameRef = useRef<HTMLInputElement | null>(null);
   const emailRef = useRef<HTMLInputElement | null>(null);
 
